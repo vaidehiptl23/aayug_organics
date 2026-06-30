@@ -1,11 +1,8 @@
 [phases.install]
-cmds = ["npm ci"]
+cmds = ["npm install"]
 
 [phases.build]
-cmds = [
-  "npm run prisma:generate",
-  "npm run build"
-]
+cmds = ["npm run build"]
 
 [start]
-cmd = "npm run prisma:migrate:prod && node dist/server.js"
+cmd = "npm start"

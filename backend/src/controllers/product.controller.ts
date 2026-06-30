@@ -7,7 +7,7 @@ const productService = new ProductService();
 
 export const getAllProducts = async (req: Request, res: Response): Promise<void> => {
   const filters = req.query as Record<string, string>;
-  const result = await productService.getAllProducts(filters);
+  const result = await productService.getAllProducts(filters) as { total: number; page: number; limit: number; products: unknown[] };
   const meta = buildPaginationMeta(result.total, result.page, result.limit);
   sendSuccess(res, result.products, 'Products retrieved', 200, meta);
 };

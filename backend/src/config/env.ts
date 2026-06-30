@@ -6,7 +6,7 @@ dotenv.config({ path: path.resolve(process.cwd(), '.env') });
 
 const envSchema = z.object({
   NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
-  PORT: z.string().default('5000'),
+  PORT: z.string().default('3000'),
   API_PREFIX: z.string().default('/api/v1'),
   FRONTEND_URL: z.string().default('http://localhost:8000'),
 

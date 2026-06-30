@@ -4,18 +4,24 @@ import { connectDatabase, disconnectDatabase } from './config/database';
 import { connectRedis, redis } from './config/redis';
 import { logger } from './utils/logger';
 
-const PORT = env.PORT;
+const PORT = parseInt(process.env.PORT || String(env.PORT), 10);
 
 async function startServer(): Promise<void> {
   try {
-    // Connect to PostgreSQL (non-fatal in dev — shows clear message if not available)
+    // Start HTTP server FIRST so Railway healthcheck passes immediately
+    const server = app.listen(PORT, '0.0.0.0', () => {
+      logger.info(`🚀 Server running on http://0.0.0.0:${PORT}`);
+      logger.info(`📚 API Docs: http://0.0.0.0:${PORT}/api-docs`);
+      logger.info(`❤️  Health:   http://0.0.0.0:${PORT}/api/v1/health`);
+      logger.info(`🌿 Environment: ${env.NODE_ENV}`);
+    });
+
+    // Connect to PostgreSQL after server starts
     try {
       await connectDatabase();
       logger.info('✅ PostgreSQL connected');
     } catch (dbError) {
-      logger.warn('⚠️  PostgreSQL connection failed — API routes requiring DB will return 503.');
-      logger.warn('   Set DATABASE_URL in backend/.env to a running PostgreSQL instance.');
-      logger.warn('   Quick start: docker run -e POSTGRES_PASSWORD=password -p 5432:5432 postgres:16-alpine');
+      logger.warn('⚠️  PostgreSQL connection failed — DB routes will return 503.');
       if (env.NODE_ENV === 'production') {
         logger.error('Database is required in production. Exiting.');
         process.exit(1);
@@ -25,17 +31,9 @@ async function startServer(): Promise<void> {
     // Connect to Redis (always optional)
     try {
       await connectRedis();
-    } catch (redisError) {
+    } catch {
       logger.warn('⚠️  Redis connection failed — caching disabled.');
     }
-
-    // Start HTTP server regardless (health check will still work)
-    const server = app.listen(PORT, () => {
-      logger.info(`🚀 Server running on http://localhost:${PORT}`);
-      logger.info(`📚 API Docs: http://localhost:${PORT}/api-docs`);
-      logger.info(`❤️  Health:   http://localhost:${PORT}/api/v1/health`);
-      logger.info(`🌿 Environment: ${env.NODE_ENV}`);
-    });
 
     // ─────────────────────────────────────────────
     // Graceful Shutdown

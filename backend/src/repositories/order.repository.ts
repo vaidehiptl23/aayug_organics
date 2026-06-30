@@ -15,7 +15,7 @@ export class OrderRepository {
     const { skip, take, page, limit } = getPaginationParams(filters.page, filters.limit);
 
     const where: Prisma.OrderWhereInput = {
-      ...(filters.status && { status: filters.status as OrderFilters['status'] }),
+      ...(filters.status && { status: filters.status as never }),
       ...(filters.userId && { userId: filters.userId }),
       ...((filters.startDate || filters.endDate) && {
         createdAt: {

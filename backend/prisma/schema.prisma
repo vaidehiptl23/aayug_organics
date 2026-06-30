@@ -230,7 +230,6 @@ model Product {
   @@index([categoryId])
   @@index([status])
   @@index([sku])
-  @@fulltext([name, description])  // MySQL full-text search
   @@map("products")
 }
 

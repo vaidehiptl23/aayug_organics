@@ -1,0 +1,13 @@
+{
+  "name": "aayug-organics-root",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "build": "cd backend && npm install && npm run prisma:generate && npm run build",
+    "start": "cd backend && npm run prisma:migrate:prod && node dist/server.js"
+  },
+  "engines": {
+    "node": ">=20.0.0",
+    "npm": ">=10.0.0"
+  }
+}

@@ -11,7 +11,7 @@
   "scripts": {
     "dev": "ts-node-dev --respawn --transpile-only src/server.ts",
     "build": "prisma generate && prisma migrate deploy",
-    "start": "node -r ts-node/register src/server.ts",
+    "start": "npx ts-node --transpile-only src/server.ts",
     "seed": "ts-node prisma/seed.ts",
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev --name init",

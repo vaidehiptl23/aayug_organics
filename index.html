@@ -1,0 +1,1207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Aayug Organics - Premium Organic Food Products</title>
+  <meta name="description" content="Discover 100% pure, organic A2 Gir Cow Ghee, Raw Honey, and more. Farm-fresh, lab-tested organic products delivered to your doorstep.">
+  <meta name="keywords" content="organic food,A2 ghee,gir cow ghee,raw honey,organic products,natural food,ayurvedic products">
+  <link rel="stylesheet" href="style.css">
+  <style>
+    /* Home Specific Styles */
+    .hero {
+      position: relative;
+      background-color: var(--color-bg-secondary);
+      overflow: hidden;
+      height: 600px;
+    }
+    
+    .hero-slider {
+      width: 100%;
+      height: 100%;
+      position: relative;
+    }
+    
+    .hero-track {
+      display: flex;
+      width: 400%;
+      height: 100%;
+      transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    
+    .hero-slide {
+      width: 25%;
+      height: 100%;
+      flex-shrink: 0;
+    }
+    
+    .hero-inner {
+      display: grid;
+      grid-template-columns: 1.2fr 0.8fr;
+      align-items: center;
+      height: 100%;
+      padding: var(--space-xl) var(--space-lg);
+    }
+    
+    .hero-content {
+      padding-right: var(--space-xl);
+    }
+    
+    .hero-subtitle {
+      font-family: var(--font-cursive);
+      font-size: 2rem;
+      color: var(--color-accent);
+      margin-bottom: var(--space-xs);
+      font-weight: bold;
+    }
+    
+    .hero-title {
+      font-size: 3.8rem;
+      color: var(--color-primary);
+      margin-bottom: var(--space-md);
+    }
+    
+    .hero-title span {
+      display: block;
+      font-size: 1.8rem;
+      font-family: var(--font-body);
+      font-weight: 500;
+      color: var(--color-text-primary);
+      margin-bottom: var(--space-xs);
+    }
+    
+    .hero-desc {
+      font-size: 1.1rem;
+      color: var(--color-text-muted);
+      margin-bottom: var(--space-lg);
+      max-width: 600px;
+    }
+    
+    .hero-price {
+      display: flex;
+      align-items: baseline;
+      gap: var(--space-sm);
+      margin-bottom: var(--space-lg);
+    }
+    
+    .hero-price-current {
+      font-size: 2.2rem;
+      font-weight: 700;
+      color: var(--color-primary);
+    }
+    
+    .hero-price-original {
+      font-size: 1.3rem;
+      color: var(--color-text-muted);
+      text-decoration: line-through;
+    }
+    
+    .hero-cta {
+      display: flex;
+      gap: var(--space-md);
+    }
+    
+    .hero-image {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .hero-placeholder {
+      font-size: 12rem;
+      filter: drop-shadow(0 15px 25px rgba(0, 0, 0, 0.15));
+      animation: float 6s ease-in-out infinite;
+    }
+    
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-15px); }
+    }
+    
+    .slider-arrow {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 50px;
+      height: 50px;
+      background-color: var(--color-white);
+      border-radius: var(--radius-full);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--color-primary);
+      z-index: 10;
+      transition: var(--transition);
+    }
+    
+    .slider-arrow:hover {
+      background-color: var(--color-primary);
+      color: var(--color-white);
+    }
+    
+    .slider-arrow-left { left: 2rem; }
+    .slider-arrow-right { right: 2rem; }
+    
+    .slider-dots {
+      position: absolute;
+      bottom: 2rem;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: var(--space-sm);
+      z-index: 10;
+    }
+    
+    .slider-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: var(--radius-full);
+      background-color: rgba(var(--color-primary-rgb), 0.2);
+      transition: var(--transition);
+    }
+    
+    .slider-dot.active {
+      background-color: var(--color-primary);
+      width: 25px;
+    }
+    
+    .hero-wave {
+      position: absolute;
+      bottom: -1px;
+      left: 0;
+      width: 100%;
+      height: 40px;
+      z-index: 5;
+    }
+    
+    .hero-wave svg {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+    
+    /* Categories spacing */
+    .categories-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: var(--space-lg);
+      margin-top: var(--space-xl);
+    }
+    
+    .category-card {
+      background-color: var(--color-white);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-lg);
+      padding: var(--space-xl) var(--space-md);
+      text-align: center;
+      transition: var(--transition);
+      box-shadow: 0 4px 15px var(--color-shadow);
+    }
+    
+    .category-card:hover {
+      transform: translateY(-8px);
+      border-color: var(--color-accent);
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+    }
+    
+    .category-icon {
+      font-size: 3.5rem;
+      margin-bottom: var(--space-md);
+    }
+    
+    .category-name {
+      font-size: 1.4rem;
+      color: var(--color-primary);
+      margin-bottom: var(--space-xs);
+    }
+    
+    .category-count {
+      color: var(--color-text-muted);
+      font-size: 0.85rem;
+      font-weight: 500;
+    }
+    
+    /* Promise section grid */
+    .promise-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: var(--space-xl);
+      margin-top: var(--space-xl);
+    }
+    
+    .promise-card {
+      text-align: center;
+      padding: var(--space-lg);
+    }
+    
+    .promise-icon {
+      font-size: 3rem;
+      margin-bottom: var(--space-md);
+    }
+    
+    .promise-title {
+      font-family: var(--font-body);
+      font-weight: 700;
+      font-size: 1.15rem;
+      margin-bottom: var(--space-sm);
+      color: var(--color-primary);
+    }
+    
+    .promise-desc {
+      color: var(--color-text-muted);
+      font-size: 0.9rem;
+    }
+    
+    /* Products Grid */
+    .products-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: var(--space-lg);
+      margin-top: var(--space-xl);
+    }
+    
+    .product-card {
+      background-color: var(--color-white);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      transition: var(--transition);
+      box-shadow: 0 4px 10px var(--color-shadow);
+      position: relative;
+    }
+    
+    .product-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+      border-color: var(--color-accent);
+    }
+    
+    .product-img-wrap {
+      background-color: var(--color-bg-secondary);
+      height: 240px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+    
+    .product-placeholder {
+      font-size: 6rem;
+      transition: var(--transition);
+    }
+    
+    .product-card:hover .product-placeholder {
+      transform: scale(1.1);
+    }
+    
+    .product-badge-wrap {
+      position: absolute;
+      top: var(--space-sm);
+      left: var(--space-sm);
+      z-index: 2;
+    }
+    
+    .product-wishlist-btn {
+      position: absolute;
+      top: var(--space-sm);
+      right: var(--space-sm);
+      width: 36px;
+      height: 36px;
+      background-color: var(--color-white);
+      border-radius: var(--radius-full);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--color-text-muted);
+      z-index: 2;
+      transition: var(--transition);
+    }
+    
+    .product-wishlist-btn:hover {
+      color: #e64980;
+    }
+    
+    .product-wishlist-btn.active {
+      color: #e64980;
+    }
+    
+    .product-wishlist-btn svg {
+      width: 18px;
+      height: 18px;
+    }
+    
+    .product-info {
+      padding: var(--space-md);
+      display: flex;
+      flex-direction: column;
+      flex-grow: 1;
+    }
+    
+    .product-cat {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--color-accent);
+      font-weight: 700;
+      margin-bottom: var(--space-xs);
+    }
+    
+    .product-name {
+      font-family: var(--font-body);
+      font-weight: 600;
+      font-size: 1.1rem;
+      color: var(--color-text-primary);
+      margin-bottom: var(--space-sm);
+      line-height: 1.3;
+    }
+    
+    .product-pricing {
+      display: flex;
+      align-items: baseline;
+      gap: var(--space-sm);
+      margin-bottom: var(--space-sm);
+    }
+    
+    .product-price {
+      font-weight: 700;
+      color: var(--color-primary);
+      font-size: 1.2rem;
+    }
+    
+    .product-orig-price {
+      color: var(--color-text-muted);
+      text-decoration: line-through;
+      font-size: 0.9rem;
+    }
+    
+    .product-rating {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 0.85rem;
+      color: var(--color-text-muted);
+      margin-bottom: var(--space-md);
+    }
+    
+    .product-rating svg {
+      width: 14px;
+      height: 14px;
+      fill: #fcc419;
+      color: #fcc419;
+    }
+    
+    .product-add-btn {
+      width: 100%;
+      background-color: var(--color-bg-secondary);
+      color: var(--color-primary);
+      padding: 0.6rem 0;
+      border-radius: var(--radius-md);
+      font-weight: 600;
+      font-size: 0.9rem;
+      text-align: center;
+      transition: var(--transition);
+      margin-top: auto;
+      border: 1px solid transparent;
+    }
+    
+    .product-add-btn:hover {
+      background-color: var(--color-primary);
+      color: var(--color-white);
+    }
+    
+    .view-all-wrap {
+      text-align: center;
+      margin-top: var(--space-xl);
+    }
+    
+    /* Testimonials Grid */
+    .testimonials-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: var(--space-xl);
+      margin-top: var(--space-xl);
+    }
+    
+    .testimonial-card {
+      background-color: var(--color-white);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-lg);
+      padding: var(--space-lg);
+      box-shadow: 0 4px 10px var(--color-shadow);
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .testimonial-stars {
+      display: flex;
+      gap: 2px;
+      margin-bottom: var(--space-md);
+    }
+    
+    .testimonial-stars svg {
+      width: 16px;
+      height: 16px;
+      fill: #fcc419;
+      color: #fcc419;
+    }
+    
+    .testimonial-text {
+      color: var(--color-text-primary);
+      font-style: italic;
+      font-size: 0.95rem;
+      margin-bottom: var(--space-lg);
+      line-height: 1.5;
+    }
+    
+    .testimonial-author {
+      display: flex;
+      align-items: center;
+      gap: var(--space-md);
+      margin-top: auto;
+    }
+    
+    .testimonial-avatar {
+      width: 44px;
+      height: 44px;
+      border-radius: var(--radius-full);
+      background-color: var(--color-primary-light);
+      color: var(--color-white);
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.95rem;
+    }
+    
+    .testimonial-name {
+      font-weight: 600;
+      font-size: 0.95rem;
+      color: var(--color-primary);
+    }
+    
+    .testimonial-location {
+      font-size: 0.75rem;
+      color: var(--color-text-muted);
+    }
+    
+    /* Trust Section badges */
+    .trust-grid {
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: var(--space-lg);
+    }
+    
+    .trust-badge {
+      display: flex;
+      align-items: center;
+      gap: var(--space-sm);
+      font-weight: 600;
+      color: var(--color-primary);
+    }
+    
+    .trust-icon {
+      font-size: 1.5rem;
+    }
+    
+    /* Bottom CTA banner */
+    .cta-banner {
+      background-color: var(--color-primary);
+      color: var(--color-white);
+      border-radius: var(--radius-lg);
+      padding: var(--space-xl);
+      text-align: center;
+      background-image: radial-gradient(circle, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0) 80%);
+      border: 3px solid var(--color-accent);
+    }
+    
+    .cta-banner h2 {
+      font-size: 2.8rem;
+      margin-bottom: var(--space-sm);
+    }
+    
+    .cta-banner p {
+      color: rgba(255, 255, 255, 0.8);
+      font-size: 1.1rem;
+      max-width: 600px;
+      margin: 0 auto var(--space-lg) auto;
+    }
+    
+    .cta-btn {
+      display: inline-block;
+      background-color: var(--color-accent);
+      color: var(--color-primary);
+      padding: 0.9rem 2.2rem;
+      border-radius: var(--radius-full);
+      font-weight: 700;
+      font-size: 1.05rem;
+      transition: var(--transition);
+      box-shadow: 0 4px 15px rgba(212, 163, 115, 0.3);
+    }
+    
+    .cta-btn:hover {
+      background-color: var(--color-white);
+      transform: translateY(-2px);
+    }
+    
+    /* Home media queries */
+    @media (max-width: 992px) {
+      .hero { height: auto; }
+      .hero-inner {
+        grid-template-columns: 1fr;
+        text-align: center;
+        padding: var(--space-xl) var(--space-md);
+      }
+      .hero-content {
+        padding-right: 0;
+        margin-bottom: var(--space-xl);
+      }
+      .hero-title { font-size: 2.8rem; }
+      .hero-cta { justify-content: center; }
+      .categories-grid, .products-grid, .testimonials-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+      .promise-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: var(--space-lg);
+      }
+    }
+    
+    @media (max-width: 576px) {
+      .hero-title { font-size: 2.2rem; }
+      .categories-grid, .products-grid, .testimonials-grid, .promise-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Announcement Bar -->
+  <div class="announcement-bar">
+    Free Shipping on orders above ₹999
+  </div>
+
+  <!-- Header -->
+  <header class="header">
+    <div class="container header-inner">
+      <button class="menu-toggle" aria-label="Open menu">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+      </button>
+      
+      <a class="logo" href="index.html">
+        <span style="font-weight:bold; color:var(--color-primary);">Aayug</span>
+        <span style="color:var(--color-accent); margin-left:5px;">Organics</span>
+      </a>
+      
+      <nav aria-label="Main navigation">
+        <ul class="nav-list">
+          <li><a class="nav-link active" href="index.html">Home</a></li>
+          <li><a class="nav-link" href="products.html">Shop</a></li>
+          <li><a class="nav-link" href="about.html">About</a></li>
+          <li><a class="nav-link" href="blog.html">Blog</a></li>
+          <li><a class="nav-link" href="contact.html">Contact</a></li>
+        </ul>
+      </nav>
+      
+      <div class="header-actions">
+        <button class="action-btn search-btn" aria-label="Search">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.35-4.35"></path></svg>
+        </button>
+        <a class="action-btn" aria-label="Wishlist" href="wishlist.html">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
+          <span class="badge-count wishlist-count">0</span>
+        </a>
+        <a class="action-btn" aria-label="Cart" href="cart.html">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path><line x1="3" y1="6" x2="21" y2="6"></line><path d="M16 10a4 4 0 0 1-8 0"></path></svg>
+          <span class="badge-count cart-count">0</span>
+        </a>
+        <a class="action-btn" aria-label="Account" href="login.html">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Mobile Nav Overlay -->
+  <div class="mobile-nav-overlay"></div>
+  <nav class="mobile-nav-drawer" aria-label="Mobile navigation">
+    <div class="mobile-drawer-header">
+      <a class="logo" href="index.html">
+        <span style="font-weight:bold; color:var(--color-primary);">Aayug</span>
+        <span style="color:var(--color-accent); margin-left:5px;">Organics</span>
+      </a>
+      <button class="mobile-drawer-close" aria-label="Close menu">&times;</button>
+    </div>
+    <ul class="mobile-nav-list">
+      <li><a class="mobile-nav-link active" href="index.html">Home</a></li>
+      <li><a class="mobile-nav-link" href="products.html">Shop</a></li>
+      <li><a class="mobile-nav-link" href="about.html">About</a></li>
+      <li><a class="mobile-nav-link" href="blog.html">Blog</a></li>
+      <li><a class="mobile-nav-link" href="contact.html">Contact</a></li>
+    </ul>
+  </nav>
+
+  <!-- Search Overlay -->
+  <div class="search-overlay">
+    <span class="search-close">&times;</span>
+    <div class="search-box">
+      <input type="search" class="search-input" placeholder="Search for organic products..." autocomplete="off">
+      <div class="search-results"></div>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <main>
+    <!-- Hero Section -->
+    <section class="hero">
+      <div class="hero-slider">
+        <div class="hero-track" id="heroTrack">
+          <!-- Slide 1 -->
+          <div class="hero-slide">
+            <div class="container hero-inner">
+              <div class="hero-content">
+                <p class="hero-subtitle">Farm Fresh & Chemical Free</p>
+                <h1 class="hero-title"><span>Pure Bilona</span> A2 Gir Cow Ghee</h1>
+                <p class="hero-desc">Made using the traditional Bilona method from the milk of grass-fed Gir cows. Rich in Omega-3, vitamins A, D, E & K.</p>
+                <div class="hero-price">
+                  <span class="hero-price-current">₹699</span>
+                  <span class="hero-price-original">₹849</span>
+                </div>
+                <div class="hero-cta">
+                  <a class="btn btn-primary btn-lg" href="products.html?category=ghee">Shop Ghee</a>
+                  <a class="btn btn-outline btn-lg" href="products.html">View All</a>
+                </div>
+              </div>
+              <div class="hero-image">
+                <div class="hero-placeholder">🥛</div>
+              </div>
+            </div>
+          </div>
+          <!-- Slide 2 -->
+          <div class="hero-slide">
+            <div class="container hero-inner">
+              <div class="hero-content">
+                <p class="hero-subtitle">100% Raw & Unprocessed</p>
+                <h1 class="hero-title"><span>Raw</span> Wild Forest Honey</h1>
+                <p class="hero-desc">Sourced from wild bee colonies in pristine forest regions. Unpasteurized, unfiltered — the way nature intended it.</p>
+                <div class="hero-price">
+                  <span class="hero-price-current">₹549</span>
+                  <span class="hero-price-original">₹599</span>
+                </div>
+                <div class="hero-cta">
+                  <a class="btn btn-primary btn-lg" href="products.html?category=honey">Shop Honey</a>
+                  <a class="btn btn-outline btn-lg" href="products.html">View All</a>
+                </div>
+              </div>
+              <div class="hero-image">
+                <div class="hero-placeholder">🍯</div>
+              </div>
+            </div>
+          </div>
+          <!-- Slide 3 -->
+          <div class="hero-slide">
+            <div class="container hero-inner">
+              <div class="hero-content">
+                <p class="hero-subtitle">Wood-Pressed & Nutrient Rich</p>
+                <h1 class="hero-title"><span>Wood-Pressed</span> Cold-Pressed Oils</h1>
+                <p class="hero-desc">Extracted using traditional wooden press (Ghani). No heat, no chemicals — retaining maximum nutrition and authentic flavour.</p>
+                <div class="hero-price">
+                  <span class="hero-price-current">₹449</span>
+                </div>
+                <div class="hero-cta">
+                  <a class="btn btn-primary btn-lg" href="products.html?category=oils">Shop Oils</a>
+                  <a class="btn btn-outline btn-lg" href="products.html">View All</a>
+                </div>
+              </div>
+              <div class="hero-image">
+                <div class="hero-placeholder">🫒</div>
+              </div>
+            </div>
+          </div>
+          <!-- Slide 4 -->
+          <div class="hero-slide">
+            <div class="container hero-inner">
+              <div class="hero-content">
+                <p class="hero-subtitle">Handpicked & Sun-Dried</p>
+                <h1 class="hero-title"><span>Premium</span> Organic Spices</h1>
+                <p class="hero-desc">From Lakadong turmeric to Malabar black pepper — sourced directly from organic farms across India for unmatched purity.</p>
+                <div class="hero-price">
+                  <span class="hero-price-current">₹249</span>
+                  <span class="hero-price-original">₹299</span>
+                </div>
+                <div class="hero-cta">
+                  <a class="btn btn-primary btn-lg" href="products.html?category=spices">Shop Spices</a>
+                  <a class="btn btn-outline btn-lg" href="products.html">View All</a>
+                </div>
+              </div>
+              <div class="hero-image">
+                <div class="hero-placeholder">🌿</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Controls -->
+        <button class="slider-arrow slider-arrow-left" id="prevSlide" aria-label="Previous slide">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+        </button>
+        <button class="slider-arrow slider-arrow-right" id="nextSlide" aria-label="Next slide">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 6 15 12 9 18"></polyline></svg>
+        </button>
+        
+        <div class="slider-dots" id="sliderDots">
+          <button class="slider-dot active" data-index="0" aria-label="Go to slide 1"></button>
+          <button class="slider-dot" data-index="1" aria-label="Go to slide 2"></button>
+          <button class="slider-dot" data-index="2" aria-label="Go to slide 3"></button>
+          <button class="slider-dot" data-index="3" aria-label="Go to slide 4"></button>
+        </div>
+      </div>
+      <div class="hero-wave">
+        <svg viewBox="0 0 1440 50" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M0,25 C360,50 720,0 1080,25 C1260,37 1380,45 1440,40 L1440,50 L0,50 Z" fill="var(--color-bg-primary)"></path>
+        </svg>
+      </div>
+    </section>
+
+    <!-- Categories Section -->
+    <section class="section">
+      <div class="container">
+        <p class="section-subtitle">Our Collections</p>
+        <h2 class="section-title">Shop by Category</h2>
+        <div class="categories-grid">
+          <a class="category-card" href="products.html?category=ghee">
+            <div class="category-icon">🥛</div>
+            <h3 class="category-name">Ghee</h3>
+            <p class="category-count">4 Products</p>
+          </a>
+          <a class="category-card" href="products.html?category=honey">
+            <div class="category-icon">🍯</div>
+            <h3 class="category-name">Honey</h3>
+            <p class="category-count">3 Products</p>
+          </a>
+          <a class="category-card" href="products.html?category=oils">
+            <div class="category-icon">🫒</div>
+            <h3 class="category-name">Oils</h3>
+            <p class="category-count">6 Products</p>
+          </a>
+          <a class="category-card" href="products.html?category=spices">
+            <div class="category-icon">🌿</div>
+            <h3 class="category-name">Spices</h3>
+            <p class="category-count">8 Products</p>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Promises Section -->
+    <section class="section-alt">
+      <div class="container">
+        <p class="section-subtitle">Our Promise</p>
+        <h2 class="section-title">Why Choose Aayug Organics?</h2>
+        <div class="promise-grid">
+          <div class="promise-card">
+            <div class="promise-icon">🌱</div>
+            <h3 class="promise-title">100% Organic</h3>
+            <p class="promise-desc">Every product is certified organic, grown without chemicals or pesticides.</p>
+          </div>
+          <div class="promise-card">
+            <div class="promise-icon">🐄</div>
+            <h3 class="promise-title">Farm Fresh</h3>
+            <p class="promise-desc">Sourced directly from trusted farmers and ethical dairies across India.</p>
+          </div>
+          <div class="promise-card">
+            <div class="promise-icon">🔬</div>
+            <h3 class="promise-title">Lab Tested</h3>
+            <p class="promise-desc">Rigorously tested for purity and quality at NABL-accredited laboratories.</p>
+          </div>
+          <div class="promise-card">
+            <div class="promise-icon">🚚</div>
+            <h3 class="promise-title">Fast Delivery</h3>
+            <p class="promise-desc">Free shipping on orders above ₹999. Delivered fresh to your doorstep.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Featured Products Section -->
+    <section class="section">
+      <div class="container">
+        <p class="section-subtitle">Handpicked for You</p>
+        <h2 class="section-title">Featured Products</h2>
+        <div class="products-grid" id="featuredGrid">
+          <!-- Statically rendered matching the original storefront -->
+          <!-- Product 1 -->
+          <div class="product-card">
+            <div class="product-img-wrap">
+              <div class="product-placeholder">🥛</div>
+              <div class="product-badge-wrap">
+                <span class="badge badge-bestseller">Bestseller</span>
+              </div>
+              <button class="product-wishlist-btn" onclick="toggleWishlist(1)" data-wishlist-id="1" aria-label="Add to wishlist">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"></path></svg>
+              </button>
+            </div>
+            <div class="product-info">
+              <span class="product-cat">Ghee</span>
+              <h3 class="product-name">A2 Gir Cow Ghee</h3>
+              <div class="product-pricing">
+                <span class="product-price">₹699</span>
+                <span class="product-orig-price">₹849</span>
+              </div>
+              <div class="product-rating">
+                <svg viewBox="0 0 20 20" fill="currentColor"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg>
+                <span>4.8</span>
+                <span>(124)</span>
+              </div>
+              <button class="product-add-btn" onclick="addToCart(1)">Add to Cart</button>
+            </div>
+          </div>
+          
+          <!-- Product 2 -->
+          <div class="product-card">
+            <div class="product-img-wrap">
+              <div class="product-placeholder">🍯</div>
+              <div class="product-badge-wrap">
+                <span class="badge badge-organic">Organic</span>
+              </div>
+              <button class="product-wishlist-btn" onclick="toggleWishlist(2)" data-wishlist-id="2" aria-label="Add to wishlist">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"></path></svg>
+              </button>
+            </div>
+            <div class="product-info">
+              <span class="product-cat">Honey</span>
+              <h3 class="product-name">Raw Forest Honey</h3>
+              <div class="product-pricing">
+                <span class="product-price">₹549</span>
+                <span class="product-orig-price">₹599</span>
+              </div>
+              <div class="product-rating">
+                <svg viewBox="0 0 20 20" fill="currentColor"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg>
+                <span>4.7</span>
+                <span>(89)</span>
+              </div>
+              <button class="product-add-btn" onclick="addToCart(2)">Add to Cart</button>
+            </div>
+          </div>
+
+          <!-- Product 3 -->
+          <div class="product-card">
+            <div class="product-img-wrap">
+              <div class="product-placeholder">🥥</div>
+              <div class="product-badge-wrap">
+                <span class="badge badge-new">New</span>
+              </div>
+              <button class="product-wishlist-btn" onclick="toggleWishlist(3)" data-wishlist-id="3" aria-label="Add to wishlist">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"></path></svg>
+              </button>
+            </div>
+            <div class="product-info">
+              <span class="product-cat">Oils</span>
+              <h3 class="product-name">Cold-Pressed Coconut Oil</h3>
+              <div class="product-pricing">
+                <span class="product-price">₹449</span>
+              </div>
+              <div class="product-rating">
+                <svg viewBox="0 0 20 20" fill="currentColor"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg>
+                <span>4.6</span>
+                <span>(56)</span>
+              </div>
+              <button class="product-add-btn" onclick="addToCart(3)">Add to Cart</button>
+            </div>
+          </div>
+
+          <!-- Product 4 -->
+          <div class="product-card">
+            <div class="product-img-wrap">
+              <div class="product-placeholder">🌿</div>
+              <div class="product-badge-wrap">
+                <span class="badge badge-sale">17% OFF</span>
+              </div>
+              <button class="product-wishlist-btn" onclick="toggleWishlist(4)" data-wishlist-id="4" aria-label="Add to wishlist">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"></path></svg>
+              </button>
+            </div>
+            <div class="product-info">
+              <span class="product-cat">Spices</span>
+              <h3 class="product-name">Organic Turmeric Powder</h3>
+              <div class="product-pricing">
+                <span class="product-price">₹249</span>
+                <span class="product-orig-price">₹299</span>
+              </div>
+              <div class="product-rating">
+                <svg viewBox="0 0 20 20" fill="currentColor"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg>
+                <span>4.9</span>
+                <span>(203)</span>
+              </div>
+              <button class="product-add-btn" onclick="addToCart(4)">Add to Cart</button>
+            </div>
+          </div>
+        </div>
+        
+        <div class="view-all-wrap">
+          <a class="btn btn-outline btn-lg" href="products.html">View All Products</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Testimonials Section -->
+    <section class="section-alt">
+      <div class="container">
+        <p class="section-subtitle">Real Stories</p>
+        <h2 class="section-title">What Our Customers Say</h2>
+        <div class="testimonials-grid">
+          <!-- Card 1 -->
+          <div class="testimonial-card">
+            <div class="testimonial-stars">
+              <svg viewBox="0 0 20 20" fill="currentColor"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg>
+              <svg viewBox="0 0 20 20" fill="currentColor"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg>
+              <svg viewBox="0 0 20 20" fill="currentColor"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg>
+              <svg viewBox="0 0 20 20" fill="currentColor"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg>
+              <svg viewBox="0 0 20 20" fill="currentColor"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg>
+            </div>
+            <p class="testimonial-text">“The A2 Ghee is absolutely divine! You can taste the purity. My family switched completely to Aayug Organics and we couldn't be happier.”</p>
+            <div class="testimonial-author">
+              <div class="testimonial-avatar">PS</div>
+              <div>
+                <div class="testimonial-name">Priya Sharma</div>
+                <div class="testimonial-location">Mumbai, Maharashtra</div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Card 2 -->
+          <div class="testimonial-card">
+            <div class="testimonial-stars">
+              <svg viewBox="0 0 20 20" fill="currentColor"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg>
+              <svg viewBox="0 0 20 20" fill="currentColor"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg>
+              <svg viewBox="0 0 20 20" fill="currentColor"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg>
+              <svg viewBox="0 0 20 20" fill="currentColor"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg>
+              <svg viewBox="0 0 20 20" fill="currentColor"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg>
+            </div>
+            <p class="testimonial-text">“Finally found genuine raw honey that lives up to its promise. The taste and texture are exactly what real honey should be.”</p>
+            <div class="testimonial-author">
+              <div class="testimonial-avatar">RP</div>
+              <div>
+                <div class="testimonial-name">Rajesh Patel</div>
+                <div class="testimonial-location">Ahmedabad, Gujarat</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Card 3 -->
+          <div class="testimonial-card">
+            <div class="testimonial-stars">
+              <svg viewBox="0 0 20 20" fill="currentColor"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg>
+              <svg viewBox="0 0 20 20" fill="currentColor"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg>
+              <svg viewBox="0 0 20 20" fill="currentColor"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg>
+              <svg viewBox="0 0 20 20" fill="currentColor"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg>
+              <svg viewBox="0 0 20 20" fill="currentColor"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg>
+            </div>
+            <p class="testimonial-text">“As an Ayurveda practitioner, I recommend Aayug products to all my clients. The quality is consistent and truly organic.”</p>
+            <div class="testimonial-author">
+              <div class="testimonial-avatar">AK</div>
+              <div>
+                <div class="testimonial-name">Ananya Krishnan</div>
+                <div class="testimonial-location">Bengaluru, Karnataka</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Trust Badges Section -->
+    <section class="section">
+      <div class="container">
+        <div class="trust-grid">
+          <div class="trust-badge">
+            <span class="trust-icon">✅</span>
+            <span>100% Organic Certified</span>
+          </div>
+          <div class="trust-badge">
+            <span class="trust-icon">🛡️</span>
+            <span>FSSAI Approved</span>
+          </div>
+          <div class="trust-badge">
+            <span class="trust-icon">🔒</span>
+            <span>Secure Payments</span>
+          </div>
+          <div class="trust-badge">
+            <span class="trust-icon">↩️</span>
+            <span>Easy Returns</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Bottom CTA Section -->
+    <section class="section">
+      <div class="container">
+        <div class="cta-banner">
+          <h2>Ready to Go Organic?</h2>
+          <p>Join thousands of families who have made the switch to pure, chemical-free organic products.</p>
+          <a class="cta-btn" href="products.html">Start Shopping</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-grid">
+        <!-- Col 1 -->
+        <div>
+          <div class="footer-logo">
+            <span style="font-weight:bold; color:var(--color-white);">Aayug</span>
+            <span style="color:var(--color-accent); margin-left:5px;">Organics</span>
+          </div>
+          <p class="footer-desc">Bringing you the purest organic products, sourced directly from trusted farms. 100% natural, lab-tested, and free from preservatives.</p>
+          <div class="social-links">
+            <a href="https://www.facebook.com/aayugorganics" target="_blank" rel="noopener noreferrer" class="social-link" aria-label="Facebook">
+              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path></svg>
+            </a>
+            <a href="https://www.instagram.com/aayugorganics" target="_blank" rel="noopener noreferrer" class="social-link" aria-label="Instagram">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
+            </a>
+          </div>
+        </div>
+        <!-- Col 2 -->
+        <div>
+          <h4 class="footer-title">Quick Links</h4>
+          <ul class="footer-links">
+            <li><a class="footer-link-item" href="index.html">Home</a></li>
+            <li><a class="footer-link-item" href="products.html">Shop All</a></li>
+            <li><a class="footer-link-item" href="about.html">About Us</a></li>
+            <li><a class="footer-link-item" href="blog.html">Blog</a></li>
+            <li><a class="footer-link-item" href="contact.html">Contact</a></li>
+          </ul>
+        </div>
+        <!-- Col 3 -->
+        <div>
+          <h4 class="footer-title">Customer Service</h4>
+          <ul class="footer-links">
+            <li><a class="footer-link-item" href="login.html">My Account</a></li>
+            <li><a class="footer-link-item" href="cart.html">Order Tracking</a></li>
+            <li><a class="footer-link-item" href="about.html">Shipping Policy</a></li>
+            <li><a class="footer-link-item" href="about.html">Return Policy</a></li>
+            <li><a class="footer-link-item" href="about.html">Privacy Policy</a></li>
+          </ul>
+        </div>
+        <!-- Col 4 -->
+        <div>
+          <h4 class="footer-title">Stay Connected</h4>
+          <p class="newsletter-text">Subscribe for exclusive offers, organic tips, and new product launches.</p>
+          <form class="newsletter-form" onsubmit="event.preventDefault(); showToast('Subscribed to newsletter successfully!'); this.reset();">
+            <input type="email" placeholder="Your email" class="newsletter-input" required aria-label="Email for newsletter">
+            <button type="submit" class="newsletter-btn">Subscribe</button>
+          </form>
+          <div class="footer-contact-list">
+            <div class="footer-contact-item">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
+              <span>+91 9173631159</span>
+            </div>
+            <div class="footer-contact-item">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+              <span>contact@aayugorganics.com</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="footer-bottom">
+        <p>© 2026 Aayug Organics. All rights reserved.</p>
+        <div class="payment-methods">
+          <span>We accept:</span>
+          <span class="payment-icon">UPI</span>
+          <span class="payment-icon">VISA</span>
+          <span class="payment-icon">MC</span>
+          <span class="payment-icon">COD</span>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- WhatsApp Widget -->
+  <div class="whatsapp-widget">
+    <a href="https://wa.me/919173631159" target="_blank" rel="noopener noreferrer" class="whatsapp-btn" aria-label="Chat with us on WhatsApp">
+      <svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"></path></svg>
+    </a>
+    <span class="whatsapp-tooltip">Chat with us</span>
+  </div>
+
+  <!-- Back to Top -->
+  <button class="back-to-top" aria-label="Scroll to top">
+    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><polyline points="18 15 12 9 6 15"></polyline></svg>
+  </button>
+
+  <script src="app.js"></script>
+  <script>
+    // Hero Slider script
+    document.addEventListener("DOMContentLoaded", () => {
+      const track = document.getElementById("heroTrack");
+      const slides = document.querySelectorAll(".hero-slide");
+      const dots = document.querySelectorAll(".slider-dot");
+      const prevBtn = document.getElementById("prevSlide");
+      const nextBtn = document.getElementById("nextSlide");
+      
+      let currentIndex = 0;
+      let slideInterval;
+      
+      const updateSlider = (index) => {
+        currentIndex = (index + slides.length) % slides.length;
+        track.style.transform = `translateX(-${currentIndex * 25}%)`;
+        
+        dots.forEach((dot, idx) => {
+          dot.classList.toggle("active", idx === currentIndex);
+        });
+      };
+      
+      const nextSlide = () => updateSlider(currentIndex + 1);
+      const prevSlide = () => updateSlider(currentIndex - 1);
+      
+      const startAutoplay = () => {
+        clearInterval(slideInterval);
+        slideInterval = setInterval(nextSlide, 5000);
+      };
+      
+      if (nextBtn) {
+        nextBtn.addEventListener("click", () => {
+          nextSlide();
+          startAutoplay();
+        });
+      }
+      
+      if (prevBtn) {
+        prevBtn.addEventListener("click", () => {
+          prevSlide();
+          startAutoplay();
+        });
+      }
+      
+      dots.forEach(dot => {
+        dot.addEventListener("click", (e) => {
+          const targetIndex = parseInt(e.target.getAttribute("data-index"));
+          updateSlider(targetIndex);
+          startAutoplay();
+        });
+      });
+      
+      startAutoplay();
+      
+      // Update heart icon active states based on wishlist
+      const wishlist = getWishlist();
+      wishlist.forEach(id => {
+        const btn = document.querySelector(`[data-wishlist-id="${id}"]`);
+        if (btn) btn.classList.add("active");
+      });
+    });
+  </script>
+</body>
+</html>

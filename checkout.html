@@ -1,0 +1,1307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Checkout — Aayug Organics | Premium Organic Food Products</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    /* Checkout Page Specific Styles */
+    .checkout-layout {
+      display: grid;
+      grid-template-columns: 1.8fr 1fr;
+      gap: var(--space-xl);
+      margin-top: var(--space-xl);
+    }
+    
+    /* Progress Indicator */
+    .checkout-progress {
+      background-color: var(--color-white);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-lg);
+      padding: var(--space-lg);
+      margin-bottom: var(--space-lg);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: relative;
+      box-shadow: 0 4px 10px var(--color-shadow);
+    }
+    
+    .progress-line {
+      position: absolute;
+      top: 50%;
+      left: 10%;
+      right: 10%;
+      height: 2px;
+      background-color: var(--color-border);
+      z-index: 1;
+      transform: translateY(-50%);
+    }
+    
+    .progress-line-fill {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 0%;
+      height: 100%;
+      background-color: var(--color-primary);
+      transition: var(--transition);
+    }
+    
+    .progress-step {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: var(--space-xs);
+      z-index: 2;
+      position: relative;
+      background-color: var(--color-white);
+      padding: 0 10px;
+    }
+    
+    .step-number {
+      width: 36px;
+      height: 36px;
+      border-radius: var(--radius-full);
+      background-color: var(--color-bg-secondary);
+      border: 2px solid var(--color-border);
+      color: var(--color-text-muted);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 0.95rem;
+      transition: var(--transition);
+    }
+    
+    .progress-step.active .step-number {
+      background-color: var(--color-primary);
+      border-color: var(--color-primary);
+      color: var(--color-white);
+    }
+    
+    .progress-step.completed .step-number {
+      background-color: var(--color-primary);
+      border-color: var(--color-primary);
+      color: var(--color-white);
+    }
+    
+    .step-label {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--color-text-muted);
+      transition: var(--transition);
+    }
+    
+    .progress-step.active .step-label {
+      color: var(--color-primary);
+      font-weight: 700;
+    }
+    
+    .progress-step.completed .step-label {
+      color: var(--color-primary);
+    }
+    
+    /* Steps Form Panels */
+    .checkout-form-panel {
+      background-color: var(--color-white);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-lg);
+      padding: var(--space-xl);
+      box-shadow: 0 4px 12px var(--color-shadow);
+      margin-bottom: var(--space-lg);
+    }
+    
+    .step-content {
+      display: none;
+    }
+    
+    .step-content.active {
+      display: block;
+      animation: fadeIn 0.4s ease forwards;
+    }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .step-title {
+      font-family: var(--font-body);
+      font-weight: 700;
+      font-size: 1.4rem;
+      color: var(--color-primary);
+      margin-bottom: var(--space-lg);
+      padding-bottom: var(--space-xs);
+      border-bottom: 2px solid var(--color-bg-secondary);
+    }
+    
+    /* Inputs & Forms */
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--space-md);
+      margin-bottom: var(--space-lg);
+    }
+    
+    .form-group-full {
+      grid-column: span 2;
+    }
+    
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    
+    .form-group label {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--color-text-primary);
+    }
+    
+    .form-group label span {
+      color: #e64980;
+    }
+    
+    .checkout-input {
+      background-color: var(--color-bg-secondary);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      padding: 0.75rem var(--space-md);
+      font-size: 0.95rem;
+      color: var(--color-text-primary);
+      transition: var(--transition);
+      width: 100%;
+    }
+    
+    .checkout-input:focus {
+      border-color: var(--color-primary);
+      background-color: var(--color-white);
+      box-shadow: 0 0 0 3px rgba(27, 67, 50, 0.1);
+    }
+    
+    .checkout-select {
+      background-color: var(--color-bg-secondary);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      padding: 0.75rem var(--space-md);
+      font-size: 0.95rem;
+      color: var(--color-text-primary);
+      transition: var(--transition);
+      width: 100%;
+      cursor: pointer;
+    }
+    
+    .checkout-select:focus {
+      border-color: var(--color-primary);
+      background-color: var(--color-white);
+    }
+    
+    /* Payment Methods Selection */
+    .payment-options {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-md);
+      margin-bottom: var(--space-lg);
+    }
+    
+    .payment-option-card {
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      padding: var(--space-md);
+      cursor: pointer;
+      transition: var(--transition);
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-sm);
+    }
+    
+    .payment-option-card:hover {
+      border-color: var(--color-primary);
+      background-color: var(--color-bg-secondary);
+    }
+    
+    .payment-option-card.selected {
+      border-color: var(--color-primary);
+      background-color: rgba(27, 67, 50, 0.03);
+      box-shadow: 0 4px 10px rgba(27, 67, 50, 0.05);
+    }
+    
+    .payment-header {
+      display: flex;
+      align-items: center;
+      gap: var(--space-md);
+    }
+    
+    .payment-radio {
+      width: 18px;
+      height: 18px;
+      accent-color: var(--color-primary);
+      cursor: pointer;
+    }
+    
+    .payment-label-container {
+      display: flex;
+      flex-grow: 1;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .payment-label-title {
+      font-weight: 700;
+      color: var(--color-primary);
+      font-size: 1rem;
+    }
+    
+    .payment-icons {
+      display: flex;
+      gap: var(--space-xs);
+    }
+    
+    .payment-details-box {
+      border-top: 1px dashed var(--color-border);
+      padding-top: var(--space-md);
+      margin-top: var(--space-xs);
+      display: none;
+    }
+    
+    .payment-option-card.selected .payment-details-box {
+      display: block;
+    }
+    
+    /* UPI QR Box */
+    .qr-container {
+      display: flex;
+      align-items: center;
+      gap: var(--space-lg);
+      background-color: var(--color-white);
+      border: 1px solid var(--color-border);
+      padding: var(--space-md);
+      border-radius: var(--radius-md);
+    }
+    
+    .qr-mock-img {
+      width: 100px;
+      height: 100px;
+      background-color: #eee;
+      border: 4px solid var(--color-white);
+      box-shadow: 0 4px 10px var(--color-shadow);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.6rem;
+      font-weight: 700;
+      color: var(--color-text-muted);
+      position: relative;
+    }
+    
+    .qr-mock-img::after {
+      content: "SCAN ME";
+      position: absolute;
+      bottom: 0;
+      width: 100%;
+      background: var(--color-primary);
+      color: var(--color-white);
+      text-align: center;
+      font-size: 0.55rem;
+      padding: 2px 0;
+    }
+    
+    .upi-instructions {
+      flex-grow: 1;
+      font-size: 0.85rem;
+    }
+    
+    .upi-instructions p {
+      margin-bottom: var(--space-xs);
+    }
+    
+    /* COD Box */
+    .cod-box {
+      background-color: var(--color-accent-light);
+      border: 1px solid rgba(212, 163, 115, 0.3);
+      padding: var(--space-md);
+      border-radius: var(--radius-md);
+      color: var(--color-primary);
+      font-weight: 500;
+      font-size: 0.9rem;
+      display: flex;
+      align-items: center;
+      gap: var(--space-sm);
+    }
+    
+    /* Navigation Controls */
+    .step-actions {
+      display: flex;
+      justify-content: space-between;
+      margin-top: var(--space-lg);
+      border-top: 1px solid var(--color-border);
+      padding-top: var(--space-lg);
+    }
+    
+    .action-back-btn {
+      color: var(--color-primary);
+      border: 1px solid var(--color-primary);
+      border-radius: var(--radius-full);
+      padding: 0.7rem var(--space-xl);
+      font-weight: 600;
+      font-size: 0.95rem;
+      transition: var(--transition);
+    }
+    
+    .action-back-btn:hover {
+      background-color: var(--color-bg-secondary);
+    }
+    
+    .action-next-btn {
+      background-color: var(--color-accent);
+      color: var(--color-primary);
+      border-radius: var(--radius-full);
+      padding: 0.7rem var(--space-xl);
+      font-weight: 700;
+      font-size: 0.95rem;
+      transition: var(--transition);
+      margin-left: auto;
+      box-shadow: 0 4px 10px rgba(212, 163, 115, 0.2);
+    }
+    
+    .action-next-btn:hover {
+      background-color: var(--color-primary);
+      color: var(--color-white);
+    }
+    
+    /* Review Confirmation Displays */
+    .review-summary-block {
+      background-color: var(--color-bg-secondary);
+      border-radius: var(--radius-md);
+      padding: var(--space-md);
+      margin-bottom: var(--space-md);
+      border: 1px solid var(--color-border);
+    }
+    
+    .review-block-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: var(--space-sm);
+      border-bottom: 1px solid var(--color-border);
+      padding-bottom: 4px;
+    }
+    
+    .review-block-title {
+      font-weight: 700;
+      color: var(--color-primary);
+      font-size: 0.95rem;
+    }
+    
+    .review-edit-link {
+      font-size: 0.8rem;
+      color: var(--color-accent);
+      font-weight: 600;
+      cursor: pointer;
+    }
+    
+    .review-edit-link:hover {
+      text-decoration: underline;
+    }
+    
+    .review-text {
+      font-size: 0.9rem;
+      color: var(--color-text-muted);
+      line-height: 1.5;
+    }
+    
+    /* Order Summary Column */
+    .summary-column {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-lg);
+    }
+    
+    .checkout-summary-box {
+      background-color: var(--color-white);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-lg);
+      padding: var(--space-lg);
+      box-shadow: 0 4px 12px var(--color-shadow);
+      height: fit-content;
+      position: sticky;
+      top: calc(var(--header-height) + 20px);
+    }
+    
+    .summary-section-title {
+      font-family: var(--font-body);
+      font-weight: 700;
+      font-size: 1.15rem;
+      color: var(--color-primary);
+      margin-bottom: var(--space-md);
+      padding-bottom: var(--space-sm);
+      border-bottom: 1px solid var(--color-border);
+    }
+    
+    .mini-cart-list {
+      max-height: 240px;
+      overflow-y: auto;
+      margin-bottom: var(--space-md);
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-sm);
+      padding-right: 4px;
+    }
+    
+    .mini-cart-item {
+      display: flex;
+      align-items: center;
+      gap: var(--space-sm);
+      padding-bottom: var(--space-sm);
+      border-bottom: 1px solid var(--color-bg-secondary);
+    }
+    
+    .mini-item-emoji {
+      font-size: 1.8rem;
+      background-color: var(--color-bg-secondary);
+      width: 44px;
+      height: 44px;
+      border-radius: var(--radius-md);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    
+    .mini-item-details {
+      flex-grow: 1;
+      min-width: 0;
+    }
+    
+    .mini-item-name {
+      font-weight: 600;
+      font-size: 0.85rem;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      color: var(--color-primary);
+    }
+    
+    .mini-item-qty {
+      font-size: 0.75rem;
+      color: var(--color-text-muted);
+    }
+    
+    .mini-item-price {
+      font-weight: 700;
+      font-size: 0.85rem;
+      color: var(--color-text-primary);
+      text-align: right;
+    }
+    
+    /* Cost rows */
+    .summary-calc-rows {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-sm);
+      border-bottom: 1px solid var(--color-border);
+      padding-bottom: var(--space-md);
+      margin-bottom: var(--space-md);
+    }
+    
+    .calc-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.9rem;
+      color: var(--color-text-muted);
+    }
+    
+    .calc-row span:last-child {
+      color: var(--color-text-primary);
+      font-weight: 600;
+    }
+    
+    .calc-total {
+      display: flex;
+      justify-content: space-between;
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: var(--color-primary);
+      margin-bottom: var(--space-xs);
+    }
+    
+    /* Success Modal Styles */
+    .success-modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(27, 67, 50, 0.4);
+      backdrop-filter: blur(8px);
+      z-index: 10000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      visibility: hidden;
+      transition: var(--transition);
+    }
+    
+    .success-modal-overlay.active {
+      opacity: 1;
+      visibility: visible;
+    }
+    
+    .success-modal-content {
+      background-color: var(--color-white);
+      border: 2px solid var(--color-primary);
+      border-radius: var(--radius-lg);
+      padding: var(--space-xl);
+      max-width: 500px;
+      width: 90%;
+      text-align: center;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+      transform: scale(0.9);
+      transition: var(--transition);
+    }
+    
+    .success-modal-overlay.active .success-modal-content {
+      transform: scale(1);
+    }
+    
+    .success-badge {
+      font-size: 4rem;
+      animation: bounce 1s ease infinite alternate;
+      margin-bottom: var(--space-md);
+      display: inline-block;
+    }
+    
+    @keyframes bounce {
+      from { transform: translateY(0); }
+      to { transform: translateY(-10px); }
+    }
+    
+    .success-title {
+      font-size: 2.2rem;
+      color: var(--color-primary);
+      margin-bottom: var(--space-sm);
+    }
+    
+    .success-desc {
+      color: var(--color-text-muted);
+      font-size: 0.95rem;
+      margin-bottom: var(--space-lg);
+    }
+    
+    .receipt-box {
+      background-color: var(--color-bg-secondary);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      padding: var(--space-md);
+      margin-bottom: var(--space-xl);
+      text-align: left;
+      font-size: 0.85rem;
+    }
+    
+    .receipt-row {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 6px;
+    }
+    
+    .receipt-row span:first-child {
+      color: var(--color-text-muted);
+    }
+    
+    .receipt-row span:last-child {
+      font-weight: 600;
+      color: var(--color-text-primary);
+    }
+    
+    .success-action-btn {
+      display: block;
+      width: 100%;
+      background-color: var(--color-accent);
+      color: var(--color-primary);
+      padding: 0.8rem;
+      border-radius: var(--radius-full);
+      font-weight: 700;
+      text-align: center;
+      transition: var(--transition);
+    }
+    
+    .success-action-btn:hover {
+      background-color: var(--color-primary);
+      color: var(--color-white);
+    }
+    
+    @media (max-width: 992px) {
+      .checkout-layout {
+        grid-template-columns: 1fr;
+      }
+      .checkout-summary-box {
+        position: static;
+      }
+    }
+    
+    @media (max-width: 768px) {
+      .form-grid {
+        grid-template-columns: 1fr;
+      }
+      .form-group-full {
+        grid-column: span 1;
+      }
+      .qr-container {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+      }
+    }
+    
+    @media (max-width: 576px) {
+      .checkout-progress {
+        padding: var(--space-sm);
+      }
+      .step-label {
+        font-size: 0.7rem;
+      }
+      .step-number {
+        width: 28px;
+        height: 28px;
+        font-size: 0.8rem;
+      }
+      .checkout-form-panel {
+        padding: var(--space-lg);
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Announcement Bar -->
+  <div class="announcement-bar">
+    Free Shipping on orders above ₹999
+  </div>
+
+  <!-- Header -->
+  <header class="header">
+    <div class="container header-inner">
+      <button class="menu-toggle" aria-label="Open menu">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+      </button>
+      
+      <a class="logo" href="index.html">
+        <span style="font-weight:bold; color:var(--color-primary);">Aayug</span>
+        <span style="color:var(--color-accent); margin-left:5px;">Organics</span>
+      </a>
+      
+      <nav aria-label="Main navigation">
+        <ul class="nav-list">
+          <li><a class="nav-link" href="index.html">Home</a></li>
+          <li><a class="nav-link" href="products.html">Shop</a></li>
+          <li><a class="nav-link" href="about.html">About</a></li>
+          <li><a class="nav-link" href="blog.html">Blog</a></li>
+          <li><a class="nav-link" href="contact.html">Contact</a></li>
+        </ul>
+      </nav>
+      
+      <div class="header-actions">
+        <button class="action-btn search-btn" aria-label="Search">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.35-4.35"></path></svg>
+        </button>
+        <a class="action-btn" aria-label="Wishlist" href="wishlist.html">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
+          <span class="badge-count wishlist-count">0</span>
+        </a>
+        <a class="action-btn" aria-label="Cart" href="cart.html">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path><line x1="3" y1="6" x2="21" y2="6"></line><path d="M16 10a4 4 0 0 1-8 0"></path></svg>
+          <span class="badge-count cart-count">0</span>
+        </a>
+        <a class="action-btn" aria-label="Account" href="login.html">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Mobile Nav Overlay -->
+  <div class="mobile-nav-overlay"></div>
+  <nav class="mobile-nav-drawer" aria-label="Mobile navigation">
+    <div class="mobile-drawer-header">
+      <a class="logo" href="index.html">
+        <span style="font-weight:bold; color:var(--color-primary);">Aayug</span>
+        <span style="color:var(--color-accent); margin-left:5px;">Organics</span>
+      </a>
+      <button class="mobile-drawer-close" aria-label="Close menu">&times;</button>
+    </div>
+    <ul class="mobile-nav-list">
+      <li><a class="mobile-nav-link" href="index.html">Home</a></li>
+      <li><a class="mobile-nav-link" href="products.html">Shop</a></li>
+      <li><a class="mobile-nav-link" href="about.html">About</a></li>
+      <li><a class="mobile-nav-link" href="blog.html">Blog</a></li>
+      <li><a class="mobile-nav-link" href="contact.html">Contact</a></li>
+    </ul>
+  </nav>
+
+  <!-- Search Overlay -->
+  <div class="search-overlay">
+    <span class="search-close">&times;</span>
+    <div class="search-box">
+      <input type="search" class="search-input" placeholder="Search for organic products..." autocomplete="off">
+      <div class="search-results"></div>
+    </div>
+  </div>
+
+  <!-- Page Header -->
+  <div class="page-header">
+    <div class="container">
+      <h1 class="page-title">Secure Checkout</h1>
+      <p class="page-subtitle">Complete your purchase in 3 easy steps</p>
+    </div>
+  </div>
+
+  <!-- Main Content Area -->
+  <main class="container">
+    <div class="checkout-layout">
+      <!-- Left Panel: Interactive Steps Form -->
+      <div class="checkout-steps-column">
+        <!-- Progress Steps Bar -->
+        <div class="checkout-progress">
+          <div class="progress-line">
+            <div class="progress-line-fill" id="progressLineFill"></div>
+          </div>
+          <div class="progress-step active" id="progStep1">
+            <div class="step-number">1</div>
+            <div class="step-label">Shipping</div>
+          </div>
+          <div class="progress-step" id="progStep2">
+            <div class="step-number">2</div>
+            <div class="step-label">Payment</div>
+          </div>
+          <div class="progress-step" id="progStep3">
+            <div class="step-number">3</div>
+            <div class="step-label">Review</div>
+          </div>
+        </div>
+
+        <!-- Forms Container -->
+        <div class="checkout-form-panel">
+          <!-- STEP 1: SHIPPING ADDRESS -->
+          <div class="step-content active" id="stepContent1">
+            <h2 class="step-title">Shipping & Contact Details</h2>
+            <form id="shippingForm" onsubmit="event.preventDefault(); goToStep(2);">
+              <div class="form-grid">
+                <div class="form-group">
+                  <label for="fullName">Full Name <span>*</span></label>
+                  <input type="text" id="fullName" class="checkout-input" placeholder="e.g. Rahul Sharma" required>
+                </div>
+                <div class="form-group">
+                  <label for="phone">Phone Number <span>*</span></label>
+                  <input type="tel" id="phone" class="checkout-input" placeholder="10-digit number" pattern="[6-9][0-9]{9}" required>
+                </div>
+                <div class="form-group-full form-group">
+                  <label for="address">Street Address <span>*</span></label>
+                  <input type="text" id="address" class="checkout-input" placeholder="Flat / House No. / Building / Street" required>
+                </div>
+                <div class="form-group-full form-group">
+                  <label for="landmark">Landmark</label>
+                  <input type="text" id="landmark" class="checkout-input" placeholder="e.g. Near Rose Hospital (optional)">
+                </div>
+                <div class="form-group">
+                  <label for="city">Town / City <span>*</span></label>
+                  <input type="text" id="city" class="checkout-input" placeholder="e.g. Ahmedabad" required>
+                </div>
+                <div class="form-grid" style="grid-column: span 1; gap: 0; padding:0; margin:0;">
+                  <div class="form-group" style="padding-right: 5px;">
+                    <label for="state">State <span>*</span></label>
+                    <select id="state" class="checkout-select" required>
+                      <option value="" disabled selected>Select</option>
+                      <option value="Gujarat">Gujarat</option>
+                      <option value="Maharashtra">Maharashtra</option>
+                      <option value="Delhi">Delhi</option>
+                      <option value="Karnataka">Karnataka</option>
+                      <option value="Rajasthan">Rajasthan</option>
+                      <option value="Uttar Pradesh">Uttar Pradesh</option>
+                      <option value="Tamil Nadu">Tamil Nadu</option>
+                    </select>
+                  </div>
+                  <div class="form-group" style="padding-left: 5px;">
+                    <label for="pinCode">PIN Code <span>*</span></label>
+                    <input type="text" id="pinCode" class="checkout-input" placeholder="6 digits" pattern="[0-9]{6}" required>
+                  </div>
+                </div>
+              </div>
+              <div class="step-actions">
+                <button type="submit" class="action-next-btn">Continue to Payment ➔</button>
+              </div>
+            </form>
+          </div>
+
+          <!-- STEP 2: PAYMENT -->
+          <div class="step-content" id="stepContent2">
+            <h2 class="step-title">Select Payment Method</h2>
+            <form id="paymentForm" onsubmit="event.preventDefault(); goToStep(3);">
+              <div class="payment-options">
+                <!-- UPI Option -->
+                <div class="payment-option-card selected" onclick="selectPayment('upi')">
+                  <div class="payment-header">
+                    <input type="radio" name="paymentMethod" value="upi" class="payment-radio" id="payRadioUpi" checked>
+                    <div class="payment-label-container">
+                      <span class="payment-label-title">UPI / Net Banking</span>
+                      <div class="payment-icons">
+                        <span class="payment-icon">GPay</span>
+                        <span class="payment-icon">PhonePe</span>
+                        <span class="payment-icon">UPI</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="payment-details-box" id="upiDetails">
+                    <div class="qr-container">
+                      <div class="qr-mock-img">
+                        QR CODE
+                      </div>
+                      <div class="upi-instructions">
+                        <p style="font-weight:600; color:var(--color-primary)">Scan QR Code or enter UPI ID:</p>
+                        <p style="color:var(--color-text-muted); font-size:0.8rem; margin-bottom: 8px;">Scan the QR using BHIM, Google Pay, PhonePe, Paytm or any UPI app to pay.</p>
+                        <input type="text" class="checkout-input" placeholder="username@upi" style="max-width: 250px;" id="upiId">
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Cards Option -->
+                <div class="payment-option-card" onclick="selectPayment('card')">
+                  <div class="payment-header">
+                    <input type="radio" name="paymentMethod" value="card" class="payment-radio" id="payRadioCard">
+                    <div class="payment-label-container">
+                      <span class="payment-label-title">Credit / Debit Card</span>
+                      <div class="payment-icons">
+                        <span class="payment-icon">Visa</span>
+                        <span class="payment-icon">MC</span>
+                        <span class="payment-icon">Rupay</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="payment-details-box" id="cardDetails">
+                    <div class="form-grid">
+                      <div class="form-group-full form-group">
+                        <label for="cardNumber">Card Number</label>
+                        <input type="text" id="cardNumber" class="checkout-input" placeholder="4000 1234 5678 9010" pattern="[0-9\s]{16,19}">
+                      </div>
+                      <div class="form-group">
+                        <label for="cardExpiry">Expiry Date</label>
+                        <input type="text" id="cardExpiry" class="checkout-input" placeholder="MM/YY" pattern="(0[1-9]|1[0-2])\/[0-9]{2}">
+                      </div>
+                      <div class="form-group">
+                        <label for="cardCvv">CVV</label>
+                        <input type="password" id="cardCvv" class="checkout-input" placeholder="123" pattern="[0-9]{3}">
+                      </div>
+                      <div class="form-group-full form-group">
+                        <label for="cardName">Cardholder Name</label>
+                        <input type="text" id="cardName" class="checkout-input" placeholder="Name on card">
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- COD Option -->
+                <div class="payment-option-card" onclick="selectPayment('cod')">
+                  <div class="payment-header">
+                    <input type="radio" name="paymentMethod" value="cod" class="payment-radio" id="payRadioCod">
+                    <div class="payment-label-container">
+                      <span class="payment-label-title">Cash on Delivery (COD)</span>
+                      <span class="payment-icon">COD</span>
+                    </div>
+                  </div>
+                  <div class="payment-details-box" id="codDetails">
+                    <div class="cod-box">
+                      <span>🚚</span>
+                      <div>
+                        <p style="font-weight: 600;">Pay in cash or UPI at the time of delivery.</p>
+                        <p style="font-size: 0.8rem; color: var(--color-text-muted); margin-top: 2px;">Additional charge: ₹0. We recommend contactless delivery payment.</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="step-actions">
+                <button type="button" class="action-back-btn" onclick="goToStep(1)">🔙 Back</button>
+                <button type="submit" class="action-next-btn">Continue to Review ➔</button>
+              </div>
+            </form>
+          </div>
+
+          <!-- STEP 3: REVIEW & CONFIRM -->
+          <div class="step-content" id="stepContent3">
+            <h2 class="step-title">Review & Place Order</h2>
+            
+            <div class="review-summary-block">
+              <div class="review-block-header">
+                <span class="review-block-title">Shipping Address</span>
+                <span class="review-edit-link" onclick="goToStep(1)">Edit</span>
+              </div>
+              <div class="review-text" id="reviewAddressText">
+                <!-- Filled dynamically by JavaScript -->
+              </div>
+            </div>
+
+            <div class="review-summary-block">
+              <div class="review-block-header">
+                <span class="review-block-title">Payment Method</span>
+                <span class="review-edit-link" onclick="goToStep(2)">Edit</span>
+              </div>
+              <div class="review-text" id="reviewPaymentText">
+                <!-- Filled dynamically by JavaScript -->
+              </div>
+            </div>
+
+            <div style="margin: var(--space-lg) 0; display:flex; gap: var(--space-sm); align-items:flex-start;">
+              <input type="checkbox" id="termsCheck" required style="margin-top: 4px; accent-color: var(--color-primary);">
+              <label for="termsCheck" style="font-size: 0.85rem; color: var(--color-text-muted);">
+                By placing your order, you agree to Aayug Organics' <a href="about.html" style="color:var(--color-primary); font-weight:600;">Terms & Conditions</a> and <a href="about.html" style="color:var(--color-primary); font-weight:600;">Privacy Policy</a>.
+              </label>
+            </div>
+
+            <div class="step-actions">
+              <button type="button" class="action-back-btn" onclick="goToStep(2)">🔙 Back</button>
+              <button type="button" class="action-next-btn" style="background-color:var(--color-primary); color:var(--color-white);" onclick="submitOrder()">Place Order 🎉</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Panel: Sticky Order Summary Sidebar -->
+      <div class="summary-column">
+        <div class="checkout-summary-box">
+          <h2 class="summary-section-title">Order Summary</h2>
+          <div class="mini-cart-list" id="miniCartContainer">
+            <!-- Dynamic Mini Cart Items -->
+          </div>
+          
+          <div class="summary-calc-rows">
+            <div class="calc-row">
+              <span>Subtotal</span>
+              <span id="subtotalVal">₹0</span>
+            </div>
+            <div class="calc-row">
+              <span>Shipping</span>
+              <span id="shippingVal">₹0</span>
+            </div>
+            <div class="calc-row" id="discountRow" style="display: none;">
+              <span style="color: #40c057; font-weight: 600;">Discount (10%)</span>
+              <span style="color: #40c057; font-weight: 600;" id="discountVal">-₹0</span>
+            </div>
+          </div>
+
+          <div class="calc-total">
+            <span>Order Total</span>
+            <span id="totalVal">₹0</span>
+          </div>
+          <p style="font-size:0.75rem; color:var(--color-text-muted); text-align:center; margin-top:var(--space-sm)">
+            🛡 Secure 256-bit SSL encrypted payments.
+          </p>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Success Modal Overlay -->
+  <div class="success-modal-overlay" id="successOverlay">
+    <div class="success-modal-content">
+      <div class="success-badge">🎉</div>
+      <h2 class="success-title">Order Placed!</h2>
+      <p class="success-desc">Thank you for choosing Aayug Organics. Your order has been placed successfully and is being processed.</p>
+      
+      <div class="receipt-box">
+        <div class="receipt-row">
+          <span>Order ID</span>
+          <span id="receiptOrderId">#AAYUG-93821</span>
+        </div>
+        <div class="receipt-row">
+          <span>Estimated Delivery</span>
+          <span id="receiptDelivery">In 3-5 Business Days</span>
+        </div>
+        <div class="receipt-row">
+          <span>Amount Paid</span>
+          <span id="receiptAmount">₹0</span>
+        </div>
+        <div class="receipt-row">
+          <span>Payment Method</span>
+          <span id="receiptPayment">Cash on Delivery</span>
+        </div>
+      </div>
+
+      <button class="success-action-btn" onclick="finishCheckout()">Continue Shopping</button>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="footer" style="margin-top: 5rem;">
+    <div class="container">
+      <div class="footer-grid">
+        <div>
+          <div class="footer-logo">
+            <span style="font-weight:bold; color:var(--color-white);">Aayug</span>
+            <span style="color:var(--color-accent); margin-left:5px;">Organics</span>
+          </div>
+          <p class="footer-desc">Bringing you the purest organic products, sourced directly from trusted farms. 100% natural, lab-tested, and free from preservatives.</p>
+          <div class="social-links">
+            <a href="https://www.facebook.com/aayugorganics" target="_blank" rel="noopener noreferrer" class="social-link" aria-label="Facebook">
+              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path></svg>
+            </a>
+            <a href="https://www.instagram.com/aayugorganics" target="_blank" rel="noopener noreferrer" class="social-link" aria-label="Instagram">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
+            </a>
+          </div>
+        </div>
+        <div>
+          <h4 class="footer-title">Quick Links</h4>
+          <ul class="footer-links">
+            <li><a class="footer-link-item" href="index.html">Home</a></li>
+            <li><a class="footer-link-item" href="products.html">Shop All</a></li>
+            <li><a class="footer-link-item" href="about.html">About Us</a></li>
+            <li><a class="footer-link-item" href="blog.html">Blog</a></li>
+            <li><a class="footer-link-item" href="contact.html">Contact</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4 class="footer-title">Customer Service</h4>
+          <ul class="footer-links">
+            <li><a class="footer-link-item" href="login.html">My Account</a></li>
+            <li><a class="footer-link-item" href="cart.html">Order Tracking</a></li>
+            <li><a class="footer-link-item" href="about.html">Shipping Policy</a></li>
+            <li><a class="footer-link-item" href="about.html">Return Policy</a></li>
+            <li><a class="footer-link-item" href="about.html">Privacy Policy</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4 class="footer-title">Stay Connected</h4>
+          <p class="newsletter-text">Subscribe for exclusive offers, organic tips, and new product launches.</p>
+          <form class="newsletter-form" onsubmit="event.preventDefault(); showToast('Subscribed to newsletter successfully!'); this.reset();">
+            <input type="email" placeholder="Your email" class="newsletter-input" required aria-label="Email for newsletter">
+            <button type="submit" class="newsletter-btn">Subscribe</button>
+          </form>
+          <div class="footer-contact-list">
+            <div class="footer-contact-item">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
+              <span>+91 9173631159</span>
+            </div>
+            <div class="footer-contact-item">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+              <span>contact@aayugorganics.com</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="footer-bottom">
+        <p>© 2026 Aayug Organics. All rights reserved.</p>
+        <div class="payment-methods">
+          <span>We accept:</span>
+          <span class="payment-icon">UPI</span>
+          <span class="payment-icon">VISA</span>
+          <span class="payment-icon">MC</span>
+          <span class="payment-icon">COD</span>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script src="app.js"></script>
+  <script>
+    let currentStep = 1;
+    let finalOrderAmount = 0;
+    let finalPaymentMethod = "UPI";
+    
+    function renderCheckoutPage() {
+      const container = document.getElementById("miniCartContainer");
+      const subtotalVal = document.getElementById("subtotalVal");
+      const shippingVal = document.getElementById("shippingVal");
+      const totalVal = document.getElementById("totalVal");
+      const discountRow = document.getElementById("discountRow");
+      const discountVal = document.getElementById("discountVal");
+      
+      const cart = getCart();
+      
+      if (cart.length === 0) {
+        // Redirect back to products or cart if checkout is accessed empty
+        window.location.href = "cart.html";
+        return;
+      }
+      
+      container.innerHTML = "";
+      let subtotal = 0;
+      
+      cart.forEach(item => {
+        const product = products.find(p => p.id === item.productId);
+        if (!product) return;
+        
+        subtotal += product.price * item.quantity;
+        
+        const card = document.createElement("div");
+        card.className = "mini-cart-item";
+        card.innerHTML = `
+          <div class="mini-item-emoji">${product.emoji}</div>
+          <div class="mini-item-details">
+            <h4 class="mini-item-name">${product.name}</h4>
+            <div class="mini-item-qty">Qty: ${item.quantity}</div>
+          </div>
+          <div class="mini-item-price">₹${product.price * item.quantity}</div>
+        `;
+        container.appendChild(card);
+      });
+      
+      // Calculate costs
+      subtotalVal.textContent = `₹${subtotal}`;
+      const shipping = subtotal > 999 ? 0 : 99;
+      shippingVal.textContent = shipping === 0 ? "FREE" : `₹${shipping}`;
+      if (shipping === 0) shippingVal.className = "free-shipping";
+      
+      const appliedDiscount = localStorage.getItem("appliedDiscount") === "true";
+      let finalTotal = subtotal + shipping;
+      if (appliedDiscount) {
+        const discount = Math.round(subtotal * 0.1);
+        discountVal.textContent = `-₹${discount}`;
+        discountRow.style.display = "flex";
+        finalTotal -= discount;
+      } else {
+        discountRow.style.display = "none";
+      }
+      
+      totalVal.textContent = `₹${finalTotal}`;
+      finalOrderAmount = finalTotal;
+    }
+    
+    function goToStep(step) {
+      if (step === 2) {
+        // Validate Address Form inputs first
+        const form = document.getElementById("shippingForm");
+        if (!form.checkValidity()) {
+          form.reportValidity();
+          return;
+        }
+      }
+      
+      if (step === 3) {
+        // Validate card fields if "Credit/Debit Card" is selected
+        const cardRadio = document.getElementById("payRadioCard");
+        if (cardRadio.checked) {
+          const numInput = document.getElementById("cardNumber");
+          const expInput = document.getElementById("cardExpiry");
+          const cvvInput = document.getElementById("cardCvv");
+          const nameInput = document.getElementById("cardName");
+          
+          if (!numInput.value || !expInput.value || !cvvInput.value || !nameInput.value) {
+            showToast("Please fill in card details");
+            return;
+          }
+        }
+        
+        // Populate review summary info
+        populateReviewDetails();
+      }
+      
+      // Toggle Form Panels visibility
+      document.getElementById(`stepContent${currentStep}`).classList.remove("active");
+      document.getElementById(`stepContent${step}`).classList.add("active");
+      
+      // Update Progress Bar visuals
+      const lineFill = document.getElementById("progressLineFill");
+      lineFill.style.width = `${(step - 1) * 50}%`;
+      
+      for (let i = 1; i <= 3; i++) {
+        const pStep = document.getElementById(`progStep${i}`);
+        pStep.classList.remove("active", "completed");
+        if (i < step) {
+          pStep.classList.add("completed");
+        } else if (i === step) {
+          pStep.classList.add("active");
+        }
+      }
+      
+      currentStep = step;
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+    
+    function selectPayment(method) {
+      const cards = document.querySelectorAll(".payment-option-card");
+      cards.forEach(card => card.classList.remove("selected"));
+      
+      if (method === 'upi') {
+        document.getElementById("payRadioUpi").checked = true;
+        document.getElementById("payRadioUpi").closest(".payment-option-card").classList.add("selected");
+        finalPaymentMethod = "UPI";
+      } else if (method === 'card') {
+        document.getElementById("payRadioCard").checked = true;
+        document.getElementById("payRadioCard").closest(".payment-option-card").classList.add("selected");
+        finalPaymentMethod = "Credit / Debit Card";
+      } else if (method === 'cod') {
+        document.getElementById("payRadioCod").checked = true;
+        document.getElementById("payRadioCod").closest(".payment-option-card").classList.add("selected");
+        finalPaymentMethod = "Cash on Delivery";
+      }
+    }
+    
+    function populateReviewDetails() {
+      const name = document.getElementById("fullName").value;
+      const phone = document.getElementById("phone").value;
+      const addr = document.getElementById("address").value;
+      const lnd = document.getElementById("landmark").value;
+      const city = document.getElementById("city").value;
+      const state = document.getElementById("state").value;
+      const pin = document.getElementById("pinCode").value;
+      
+      const reviewAddrText = document.getElementById("reviewAddressText");
+      reviewAddrText.innerHTML = `
+        <strong>${name}</strong><br>
+        ${addr}${lnd ? ', ' + lnd : ''}<br>
+        ${city}, ${state} - ${pin}<br>
+        <strong>Phone:</strong> +91 ${phone}
+      `;
+      
+      const reviewPayText = document.getElementById("reviewPaymentText");
+      if (finalPaymentMethod === "UPI") {
+        const upiVal = document.getElementById("upiId").value || "Direct UPI scan";
+        reviewPayText.innerHTML = `💳 <strong>UPI / Net Banking</strong> (${upiVal})`;
+      } else if (finalPaymentMethod === "Credit / Debit Card") {
+        const cardNum = document.getElementById("cardNumber").value;
+        const masked = cardNum ? '•••• •••• •••• ' + cardNum.replace(/\s/g, '').slice(-4) : '•••• •••• •••• 1234';
+        reviewPayText.innerHTML = `💳 <strong>Credit/Debit Card</strong> (${masked})`;
+      } else {
+        reviewPayText.innerHTML = `🚚 <strong>Cash on Delivery (COD)</strong> — Pay on arrival.`;
+      }
+    }
+    
+    function submitOrder() {
+      const termsCheck = document.getElementById("termsCheck");
+      if (!termsCheck.checked) {
+        showToast("Please agree to the Terms & Conditions");
+        return;
+      }
+      
+      // Simulate Order Placement Success
+      const randomOrderId = "AAYUG-" + Math.floor(100000 + Math.random() * 900000);
+      
+      document.getElementById("receiptOrderId").textContent = "#" + randomOrderId;
+      document.getElementById("receiptAmount").textContent = "₹" + finalOrderAmount;
+      document.getElementById("receiptPayment").textContent = finalPaymentMethod;
+      
+      // Open Success Overlay Modal
+      document.getElementById("successOverlay").classList.add("active");
+    }
+    
+    function finishCheckout() {
+      // Clear Cart State globally
+      localStorage.removeItem("cart");
+      localStorage.removeItem("appliedDiscount");
+      
+      // Redirect to home
+      window.location.href = "index.html";
+    }
+    
+    document.addEventListener("DOMContentLoaded", () => {
+      renderCheckoutPage();
+    });
+  </script>
+</body>
+</html>

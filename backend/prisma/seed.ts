@@ -6,9 +6,7 @@ const prisma = new PrismaClient();
 async function main() {
   console.log('🌱 Seeding database...');
 
-  // ─────────────────────────────────────────────
-  // Admin User
-  // ─────────────────────────────────────────────
+  // ── Admin user ────────────────────────────────────────────
   const adminPassword = await bcrypt.hash('Admin@123', 12);
   const admin = await prisma.user.upsert({
     where: { email: 'admin@aayugorganics.com' },
@@ -22,11 +20,9 @@ async function main() {
       isEmailVerified: true,
     },
   });
-  console.log(`✅ Admin user: ${admin.email}`);
+  console.log(`✅ Admin: ${admin.email}`);
 
-  // ─────────────────────────────────────────────
-  // Demo Customer
-  // ─────────────────────────────────────────────
+  // ── Demo customer ─────────────────────────────────────────
   const customerPassword = await bcrypt.hash('Customer@123', 12);
   const customer = await prisma.user.upsert({
     where: { email: 'rahul@example.com' },
@@ -41,20 +37,18 @@ async function main() {
       isEmailVerified: true,
     },
   });
-  console.log(`✅ Demo customer: ${customer.email}`);
+  console.log(`✅ Customer: ${customer.email}`);
 
-  // ─────────────────────────────────────────────
-  // Categories
-  // ─────────────────────────────────────────────
-  const categories = [
-    { name: 'Ghee', slug: 'ghee', description: 'Pure A2 cow ghee and buffalo ghee products', sortOrder: 1 },
-    { name: 'Honey', slug: 'honey', description: 'Raw and infused natural honey varieties', sortOrder: 2 },
-    { name: 'Oils', slug: 'oils', description: 'Cold-pressed and wood-pressed oils', sortOrder: 3 },
-    { name: 'Spices', slug: 'spices', description: 'Stone-ground and organic spice blends', sortOrder: 4 },
+  // ── Categories ────────────────────────────────────────────
+  const categoryData = [
+    { name: 'Salt',  slug: 'salt',  description: 'Premium Himalayan Crystal Salt', sortOrder: 1 },
+    { name: 'Honey', slug: 'honey', description: 'Raw unprocessed natural honey',  sortOrder: 2 },
+    { name: 'Hing',  slug: 'hing',  description: 'Pure Asafoetida',                sortOrder: 3 },
+    { name: 'Ghee',  slug: 'ghee',  description: 'Pure A2 Gir Cow Ghee',           sortOrder: 4 },
   ];
 
   const createdCategories: Record<string, string> = {};
-  for (const cat of categories) {
+  for (const cat of categoryData) {
     const created = await prisma.category.upsert({
       where: { slug: cat.slug },
       update: {},
@@ -64,24 +58,66 @@ async function main() {
     console.log(`✅ Category: ${cat.name}`);
   }
 
-  // ─────────────────────────────────────────────
-  // Products
-  // ─────────────────────────────────────────────
-  const products = [
-    { name: 'A2 Gir Cow Ghee', slug: 'a2-gir-cow-ghee', sku: 'GHE-A2G-001', categorySlug: 'ghee', price: 699, discountPrice: null, originalPrice: 849, badge: 'Bestseller', stock: 50 },
-    { name: 'Raw Forest Honey', slug: 'raw-forest-honey', sku: 'HON-RAW-001', categorySlug: 'honey', price: 549, discountPrice: null, originalPrice: 599, badge: 'Organic', stock: 35 },
-    { name: 'Cold-Pressed Coconut Oil', slug: 'cold-pressed-coconut-oil', sku: 'OIL-COC-001', categorySlug: 'oils', price: 449, discountPrice: null, originalPrice: null, badge: 'New', stock: 40 },
-    { name: 'Organic Turmeric Powder', slug: 'organic-turmeric-powder', sku: 'SPI-TUR-001', categorySlug: 'spices', price: 249, discountPrice: 249, originalPrice: 299, badge: '17% OFF', stock: 80 },
-    { name: 'A2 Bilona Cow Ghee', slug: 'a2-bilona-cow-ghee', sku: 'GHE-BIL-001', categorySlug: 'ghee', price: 799, discountPrice: null, originalPrice: 899, badge: 'Bestseller', stock: 30 },
-    { name: 'Wild Forest Honey', slug: 'wild-forest-honey', sku: 'HON-WLD-001', categorySlug: 'honey', price: 599, discountPrice: null, originalPrice: null, badge: 'Bestseller', stock: 25 },
-    { name: 'Cold-Pressed Virgin Coconut Oil', slug: 'cold-pressed-virgin-coconut-oil', sku: 'OIL-VCO-001', categorySlug: 'oils', price: 499, discountPrice: null, originalPrice: 549, badge: 'Bestseller', stock: 45 },
-    { name: 'Lakadong Turmeric Powder', slug: 'lakadong-turmeric-powder', sku: 'SPI-LAK-001', categorySlug: 'spices', price: 349, discountPrice: null, originalPrice: 399, badge: 'Bestseller', stock: 60 },
+  // ── Products ──────────────────────────────────────────────
+  const productData = [
+    {
+      name: 'Premium Himalayan Crystal Salt',
+      slug: 'premium-himalayan-crystal-salt',
+      sku: 'SAL-HIM-001',
+      categorySlug: 'salt',
+      price: 199,
+      discountPrice: null,
+      originalPrice: 249,
+      stock: 100,
+      badge: 'Bestseller',
+      weight: '500',
+      description: 'Harvested from ancient Himalayan salt mines. 100% pure, unrefined with 84+ natural trace minerals. A healthier alternative to processed table salt.',
+    },
+    {
+      name: 'Raw Forest Honey',
+      slug: 'raw-forest-honey',
+      sku: 'HON-RAW-001',
+      categorySlug: 'honey',
+      price: 549,
+      discountPrice: null,
+      originalPrice: 649,
+      stock: 75,
+      badge: 'Organic',
+      weight: '500',
+      description: 'Pure raw honey from wild forest hives. Unheated, unfiltered, unpasteurised. Retains all natural enzymes, pollen and antioxidants.',
+    },
+    {
+      name: 'Pure Hing (Asafoetida)',
+      slug: 'pure-hing-asafoetida',
+      sku: 'HNG-PUR-001',
+      categorySlug: 'hing',
+      price: 299,
+      discountPrice: null,
+      originalPrice: 349,
+      stock: 60,
+      badge: 'New',
+      weight: '50',
+      description: 'Finest quality Hing sourced from Afghanistan. Pure resin with no added starch or fillers. Powerful digestive and anti-bloating properties.',
+    },
+    {
+      name: 'A2 Gir Cow Ghee',
+      slug: 'a2-gir-cow-ghee',
+      sku: 'GHE-A2G-001',
+      categorySlug: 'ghee',
+      price: 899,
+      discountPrice: null,
+      originalPrice: 1099,
+      stock: 50,
+      badge: 'Bestseller',
+      weight: '500',
+      description: 'Pure A2 Gir Cow Ghee made with traditional Vedic Bilona method. Hand-churned from curd of indigenous Gir cows. Rich in vitamins A, D, E, K and Omega-3.',
+    },
   ];
 
-  for (const p of products) {
+  for (const p of productData) {
     const existing = await prisma.product.findFirst({ where: { slug: p.slug } });
     if (!existing) {
-      await prisma.product.create({
+      const product = await prisma.product.create({
         data: {
           name: p.name,
           slug: p.slug,
@@ -92,17 +128,29 @@ async function main() {
           stockQuantity: p.stock,
           badge: p.badge,
           status: 'ACTIVE',
-          isFeatured: p.badge === 'Bestseller',
-          description: `Premium quality ${p.name} from Aayug Organics. 100% pure, natural and organic.`,
+          isFeatured: true,
+          description: p.description,
+          weight: parseFloat(p.weight),
+          weightUnit: p.categorySlug === 'hing' ? 'g' : p.categorySlug === 'ghee' ? 'ml' : 'g',
+        },
+      });
+      // Add placeholder image
+      await prisma.productImage.create({
+        data: {
+          productId: product.id,
+          url: `https://placehold.co/600x600/1b4332/ffffff?text=${encodeURIComponent(p.name)}`,
+          altText: p.name,
+          isPrimary: true,
+          sortOrder: 0,
         },
       });
       console.log(`✅ Product: ${p.name}`);
+    } else {
+      console.log(`⏭  Skipped (exists): ${p.name}`);
     }
   }
 
-  // ─────────────────────────────────────────────
-  // Sample Coupon
-  // ─────────────────────────────────────────────
+  // ── Coupons ───────────────────────────────────────────────
   await prisma.coupon.upsert({
     where: { code: 'ORGANIC10' },
     update: {},
@@ -110,8 +158,8 @@ async function main() {
       code: 'ORGANIC10',
       type: 'PERCENTAGE',
       value: 10,
-      minOrderAmount: 500,
-      maxDiscountAmount: 200,
+      minOrderAmount: 299,
+      maxDiscountAmount: 150,
       usageLimit: 1000,
       perUserLimit: 3,
       isActive: true,
@@ -134,20 +182,11 @@ async function main() {
   });
   console.log('✅ Coupon: WELCOME50');
 
-  console.log('\n🎉 Seed completed successfully!');
-  console.log('\nAdmin Login:');
-  console.log('  Email:    admin@aayugorganics.com');
-  console.log('  Password: Admin@123');
-  console.log('\nCustomer Login:');
-  console.log('  Email:    rahul@example.com');
-  console.log('  Password: Customer@123');
+  console.log('\n🎉 Seed completed!');
+  console.log('Admin:    admin@aayugorganics.com / Admin@123');
+  console.log('Customer: rahul@example.com / Customer@123');
 }
 
 main()
-  .catch((e) => {
-    console.error(e);
-    process.exit(1);
-  })
-  .finally(async () => {
-    await prisma.$disconnect();
-  });
+  .catch((e) => { console.error(e); process.exit(1); })
+  .finally(async () => { await prisma.$disconnect(); });

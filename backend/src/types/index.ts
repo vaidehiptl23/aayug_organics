@@ -7,6 +7,7 @@ export interface AuthenticatedUser {
   role: Role;
 }
 
+// Extend Express Request properly so all req.body/params/query/file/files work
 export interface AuthenticatedRequest extends Request {
   user?: AuthenticatedUser;
 }

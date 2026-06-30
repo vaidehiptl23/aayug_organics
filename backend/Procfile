@@ -1,0 +1,1 @@
+web: npm run prisma:migrate:prod && node dist/server.js

@@ -85,13 +85,13 @@ export class OrderRepository {
   async getMonthlyRevenue(year: number) {
     return prisma.$queryRaw`
       SELECT
-        MONTH(createdAt) AS month,
-        SUM(grandTotal) AS revenue,
-        COUNT(*) AS orders
+        EXTRACT(MONTH FROM "createdAt") AS month,
+        SUM("grandTotal")::float AS revenue,
+        COUNT(*)::int AS orders
       FROM orders
-      WHERE YEAR(createdAt) = ${year}
+      WHERE EXTRACT(YEAR FROM "createdAt") = ${year}
         AND status IN ('DELIVERED', 'CONFIRMED', 'PROCESSING', 'SHIPPED')
-      GROUP BY MONTH(createdAt)
+      GROUP BY EXTRACT(MONTH FROM "createdAt")
       ORDER BY month
     `;
   }

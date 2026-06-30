@@ -1,22 +1,15 @@
 // ═══════════════════════════════════════════════════════════════
 // Aayug Organics – Prisma Schema
-// Database: MySQL (hosted on Aiven — free tier, works locally & in prod)
-//
-// SETUP:
-//   1. https://aiven.io → Free MySQL service → copy connection URI
-//   2. Paste as DATABASE_URL in backend/.env
-//   3. npm run prisma:migrate && npm run prisma:seed
+// Database: PostgreSQL on Aiven (free tier)
 // ═══════════════════════════════════════════════════════════════
 
 generator client {
-  provider        = "prisma-client-js"
-  previewFeatures = ["fullTextSearch", "fullTextIndex"]
+  provider = "prisma-client-js"
 }
 
 datasource db {
-  provider     = "mysql"
-  url          = env("DATABASE_URL")
-  relationMode = "prisma"   // Required for PlanetScale-style hosts (no FK constraints at DB level)
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
 // ─────────────────────────────────────────────

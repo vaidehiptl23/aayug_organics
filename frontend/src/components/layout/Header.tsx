@@ -27,11 +27,22 @@ export function Header() {
   const [searchQuery, setSearchQuery] = useState("");
   const [scrolled, setScrolled] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
   const searchRef = useRef<HTMLInputElement>(null);
 
-  const totalItems = useCartStore((s) => s.totalItems());
+  // Must wait for client mount before reading localStorage-backed stores
+  useEffect(() => { setMounted(true); }, []);
+
+  const totalItems    = useCartStore((s) => s.totalItems());
   const wishlistCount = useWishlistStore((s) => s.items.length);
+
+  // Use 0 on server to avoid hydration mismatch — real values load after mount
+  const cartCount     = mounted ? totalItems    : 0;
+  const favCount      = mounted ? wishlistCount : 0;
   const { user, isAuthenticated, logout } = useAuthStore();
+
+  // Hydration-safe derived values
+  const authed = mounted ? isAuthenticated : false;
 
   // Search results
   const searchResults = searchQuery.length > 1
@@ -104,12 +115,12 @@ export function Header() {
           <Link
             href="/wishlist"
             className="relative rounded-lg p-2 text-gray-600 transition-colors hover:bg-gray-100 hover:text-[#1b4332] dark:text-gray-300 dark:hover:bg-gray-800"
-            aria-label={`Wishlist (${wishlistCount} items)`}
+            aria-label={`Wishlist (${favCount} items)`}
           >
             <Heart className="h-5 w-5" />
-            {wishlistCount > 0 && (
+            {favCount > 0 && (
               <span className="absolute -right-0.5 -top-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white">
-                {wishlistCount}
+                {favCount}
               </span>
             )}
           </Link>
@@ -118,12 +129,12 @@ export function Header() {
           <Link
             href="/cart"
             className="relative rounded-lg p-2 text-gray-600 transition-colors hover:bg-gray-100 hover:text-[#1b4332] dark:text-gray-300 dark:hover:bg-gray-800"
-            aria-label={`Cart (${totalItems} items)`}
+            aria-label={`Cart (${cartCount} items)`}
           >
             <ShoppingCart className="h-5 w-5" />
-            {totalItems > 0 && (
+            {cartCount > 0 && (
               <span className="absolute -right-0.5 -top-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-[#1b4332] text-[10px] font-bold text-white">
-                {totalItems > 99 ? "99+" : totalItems}
+                {cartCount > 99 ? "99+" : cartCount}
               </span>
             )}
           </Link>
@@ -137,7 +148,7 @@ export function Header() {
               aria-expanded={userMenuOpen}
             >
               <User className="h-5 w-5" />
-              {isAuthenticated && (
+              {authed && (
                 <span className="text-sm font-medium">{user?.firstName}</span>
               )}
               <ChevronDown className="h-3 w-3" />
@@ -148,7 +159,7 @@ export function Header() {
                 className="absolute right-0 top-full mt-2 w-56 rounded-xl border border-gray-100 bg-white py-2 shadow-xl dark:border-gray-700 dark:bg-gray-800"
                 onMouseLeave={() => setUserMenuOpen(false)}
               >
-                {isAuthenticated ? (
+                {authed ? (
                   <>
                     <div className="border-b border-gray-100 px-4 py-2 dark:border-gray-700">
                       <p className="text-sm font-semibold text-gray-800 dark:text-white">
@@ -272,7 +283,7 @@ export function Header() {
             ))}
           </nav>
           <div className="mt-4 flex flex-col gap-2 border-t border-gray-100 pt-4 dark:border-gray-700">
-            {isAuthenticated ? (
+            {authed ? (
               <>
                 <Link href="/dashboard" onClick={() => setMobileOpen(false)} className="rounded-lg px-3 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:text-gray-300">Dashboard</Link>
                 <button onClick={() => { logout(); setMobileOpen(false); }} className="rounded-lg px-3 py-2.5 text-left text-sm font-medium text-red-600 hover:bg-red-50">Sign Out</button>

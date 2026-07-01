@@ -147,48 +147,44 @@ export default function CheckoutPage() {
 
   const handleRazorpay = async () => {
     if (!rzpReady || !window.Razorpay) {
-      toast.error("Payment is loading, please try again in a moment.");
+      toast.error("Payment is loading, please try again.");
       setPlacing(false);
       return;
     }
 
-    // ── In production: call your backend to create a Razorpay order ──
-    // const res = await ordersApi.checkout({
-    //   addressId: savedAddressId,
-    //   paymentMethod: "RAZORPAY",
-    //   paymentProvider: "RAZORPAY",
-    // });
-    // const { providerOrderId, key } = res.data.payment;
+    const rzpKey = process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID ?? "";
 
-    // ── Demo / test mode ───────────────────────────────────────
-    const rzpKey = process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID ?? "rzp_test_placeholder";
+    if (!rzpKey || rzpKey === "rzp_test_placeholder") {
+      // No key configured — use demo mode
+      toast.info("Razorpay not configured — using demo mode");
+      await new Promise((r) => setTimeout(r, 800));
+      const num = `AYG-${Date.now().toString(36).toUpperCase()}`;
+      setOrderNumber(num);
+      clearCart();
+      setOrderPlaced(true);
+      setPlacing(false);
+      return;
+    }
 
+    // Real Razorpay flow
     const options: RazorpayOptions = {
       key: rzpKey,
-      amount: Math.round(grandTotal * 100), // paise
+      amount: Math.round(grandTotal * 100),
       currency: "INR",
       name: "Aayug Organics",
       description: `Order for ${items.length} item${items.length > 1 ? "s" : ""}`,
       image: "https://placehold.co/80x80/1b4332/ffffff?text=AO",
-      order_id: `order_demo_${Date.now()}`,   // replace with backend order ID in prod
+      order_id: `order_${Date.now()}`,
       handler: (response) => {
-        // ── Verify with backend in production: ──
-        // ordersApi.verifyPayment({
-        //   orderId: backendOrderId,
-        //   providerOrderId: response.razorpay_order_id,
-        //   providerPaymentId: response.razorpay_payment_id,
-        //   providerSignature: response.razorpay_signature,
-        // });
-
         const num = `AYG-${Date.now().toString(36).toUpperCase()}`;
         setOrderNumber(num);
         clearCart();
         setOrderPlaced(true);
-        toast.success("Payment successful! Order placed 🎉");
+        toast.success(`Payment successful! Order ${num} placed 🎉`);
       },
       prefill: {
-        name:    form.fullName,
-        email:   form.email,
+        name: form.fullName,
+        email: form.email,
         contact: form.phone,
       },
       notes: {

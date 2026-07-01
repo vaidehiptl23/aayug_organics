@@ -2,144 +2,133 @@
 import { useState } from "react";
 import {
   IndianRupee, ShoppingBag, Users, TrendingUp,
-  ArrowUpRight, ArrowDownRight, AlertTriangle,
-  CheckCircle, Clock, Package,
+  ArrowUpRight, AlertTriangle, CheckCircle, Clock, Package,
 } from "lucide-react";
 import { MONTHLY_REVENUE, CATEGORY_SALES, ORDERS, PRODUCTS } from "@/data/mock";
-import { formatPrice, cn } from "@/lib/utils";
+import { formatPrice } from "@/lib/utils";
 
-const maxRevenue = Math.max(...MONTHLY_REVENUE.map((m) => m.revenue));
-const maxOrders  = Math.max(...MONTHLY_REVENUE.map((m) => m.orders));
+const maxRev = Math.max(...MONTHLY_REVENUE.map((m) => m.revenue));
+const maxOrd = Math.max(...MONTHLY_REVENUE.map((m) => m.orders));
 
-const STATUS_STYLE: Record<string, string> = {
-  delivered:  "bg-green-100 text-green-700",
-  shipped:    "bg-blue-100 text-blue-700",
-  processing: "bg-amber-100 text-amber-700",
-  confirmed:  "bg-purple-100 text-purple-700",
-  pending:    "bg-gray-100 text-gray-600",
-  cancelled:  "bg-red-100 text-red-700",
+const STATUS_STYLE: Record<string, { bg: string; color: string }> = {
+  delivered:  { bg: "#dcfce7", color: "#16a34a" },
+  shipped:    { bg: "#dbeafe", color: "#2563eb" },
+  processing: { bg: "#fef9c3", color: "#ca8a04" },
+  confirmed:  { bg: "#f3e8ff", color: "#9333ea" },
+  pending:    { bg: "#f1f5f9", color: "#64748b" },
+  cancelled:  { bg: "#fee2e2", color: "#dc2626" },
 };
 
 export default function AdminDashboard() {
-  const [activeChart, setActiveChart] = useState<"revenue" | "orders">("revenue");
+  const [chart, setChart] = useState<"revenue" | "orders">("revenue");
 
-  const totalRevenue  = MONTHLY_REVENUE.reduce((s, m) => s + m.revenue, 0);
-  const totalOrders   = MONTHLY_REVENUE.reduce((s, m) => s + m.orders, 0);
-  const avgOrderValue = Math.round(totalRevenue / totalOrders);
-  const lowStock      = PRODUCTS.filter((p) => p.stock < 20);
+  const totalRevenue = MONTHLY_REVENUE.reduce((s, m) => s + m.revenue, 0);
+  const totalOrders  = MONTHLY_REVENUE.reduce((s, m) => s + m.orders, 0);
+  const avgOrder     = Math.round(totalRevenue / totalOrders);
+  const lowStock     = PRODUCTS.filter((p) => p.stock < 20);
 
   const stats = [
-    { label: "Total Revenue",    value: formatPrice(totalRevenue),         change: "+18.2%", up: true,  icon: IndianRupee, bg: "bg-green-50",  ic: "text-green-600"  },
-    { label: "Total Orders",     value: totalOrders.toLocaleString("en-IN"), change: "+12.5%", up: true,  icon: ShoppingBag, bg: "bg-blue-50",   ic: "text-blue-600"   },
-    { label: "Total Customers",  value: "284",                              change: "+8.1%",  up: true,  icon: Users,       bg: "bg-purple-50", ic: "text-purple-600" },
-    { label: "Avg. Order Value", value: formatPrice(avgOrderValue),         change: "+4.3%",  up: true,  icon: TrendingUp,  bg: "bg-amber-50",  ic: "text-amber-600"  },
+    { label: "Total Revenue",    value: formatPrice(totalRevenue),            change: "+18.2%", icon: IndianRupee, bg: "#f0fdf4", ic: "#16a34a" },
+    { label: "Total Orders",     value: totalOrders.toLocaleString("en-IN"), change: "+12.5%", icon: ShoppingBag, bg: "#eff6ff", ic: "#2563eb" },
+    { label: "Customers",        value: "284",                                change: "+8.1%",  icon: Users,       bg: "#faf5ff", ic: "#9333ea" },
+    { label: "Avg. Order Value", value: formatPrice(avgOrder),                change: "+4.3%",  icon: TrendingUp,  bg: "#fffbeb", ic: "#d97706" },
   ];
 
   return (
-    <div className="space-y-8">
+    <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
+
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
-        <p className="text-gray-500 text-sm mt-1">Welcome back! Here&apos;s your store overview.</p>
+        <h1 style={{ fontSize: 22, fontWeight: 700, color: "#0f172a", margin: 0 }}>Dashboard</h1>
+        <p style={{ fontSize: 13, color: "#94a3b8", marginTop: 4 }}>Welcome back! Here&apos;s your store overview.</p>
       </div>
 
       {/* Stat cards */}
-      <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-4">
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 16 }}>
         {stats.map((s) => (
-          <div key={s.label} className="rounded-2xl bg-white border border-gray-100 p-5 shadow-sm">
-            <div className="flex items-center justify-between mb-4">
-              <div className={cn("h-10 w-10 rounded-xl flex items-center justify-center", s.bg)}>
-                <s.icon className={cn("h-5 w-5", s.ic)} />
+          <div key={s.label} style={{ background: "white", borderRadius: 16, padding: 20, border: "1px solid #f1f5f9", boxShadow: "0 1px 3px rgba(0,0,0,0.04)" }}>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 16 }}>
+              <div style={{ width: 40, height: 40, borderRadius: 12, background: s.bg, display: "flex", alignItems: "center", justifyContent: "center" }}>
+                <s.icon size={18} color={s.ic} />
               </div>
-              <span className={cn("flex items-center gap-1 text-xs font-semibold rounded-full px-2 py-0.5", s.up ? "bg-green-50 text-green-600" : "bg-red-50 text-red-500")}>
-                {s.up ? <ArrowUpRight className="h-3 w-3" /> : <ArrowDownRight className="h-3 w-3" />}
-                {s.change}
+              <span style={{ display: "flex", alignItems: "center", gap: 3, fontSize: 11, fontWeight: 600, color: "#16a34a", background: "#f0fdf4", padding: "3px 8px", borderRadius: 20 }}>
+                <ArrowUpRight size={11} />{s.change}
               </span>
             </div>
-            <p className="text-2xl font-bold text-gray-900">{s.value}</p>
-            <p className="text-xs text-gray-500 mt-1">{s.label}</p>
+            <p style={{ fontSize: 22, fontWeight: 700, color: "#0f172a", margin: 0 }}>{s.value}</p>
+            <p style={{ fontSize: 12, color: "#94a3b8", marginTop: 4 }}>{s.label}</p>
           </div>
         ))}
       </div>
 
-      {/* Charts row */}
-      <div className="grid grid-cols-1 gap-6 xl:grid-cols-3">
+      {/* Charts */}
+      <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr", gap: 16 }}>
 
-        {/* Revenue / Orders bar chart */}
-        <div className="xl:col-span-2 rounded-2xl bg-white border border-gray-100 p-6 shadow-sm">
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="font-bold text-gray-800">Performance Overview</h2>
-            <div className="flex gap-1 bg-gray-100 rounded-lg p-1">
+        {/* Bar chart */}
+        <div style={{ background: "white", borderRadius: 16, padding: 24, border: "1px solid #f1f5f9", boxShadow: "0 1px 3px rgba(0,0,0,0.04)" }}>
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 20 }}>
+            <h2 style={{ fontSize: 15, fontWeight: 700, color: "#0f172a", margin: 0 }}>Performance Overview</h2>
+            <div style={{ display: "flex", gap: 4, background: "#f1f5f9", borderRadius: 10, padding: 4 }}>
               {(["revenue", "orders"] as const).map((t) => (
-                <button
-                  key={t}
-                  onClick={() => setActiveChart(t)}
-                  className={cn(
-                    "px-3 py-1 rounded-md text-xs font-medium capitalize transition-all",
-                    activeChart === t ? "bg-white text-[#1b4332] shadow-sm" : "text-gray-500"
-                  )}
-                >
-                  {t}
-                </button>
+                <button key={t} onClick={() => setChart(t)} style={{
+                  padding: "5px 12px", borderRadius: 7, border: "none", cursor: "pointer", fontSize: 12, fontWeight: 500,
+                  background: chart === t ? "white" : "transparent",
+                  color: chart === t ? "#1b4332" : "#94a3b8",
+                  boxShadow: chart === t ? "0 1px 3px rgba(0,0,0,0.1)" : "none",
+                  textTransform: "capitalize",
+                }}>{t}</button>
               ))}
             </div>
           </div>
-          <div className="flex items-end gap-1.5 h-52">
+          <div style={{ display: "flex", alignItems: "flex-end", gap: 6, height: 180 }}>
             {MONTHLY_REVENUE.map((m) => {
-              const val = activeChart === "revenue" ? m.revenue : m.orders;
-              const max = activeChart === "revenue" ? maxRevenue : maxOrders;
+              const val = chart === "revenue" ? m.revenue : m.orders;
+              const max = chart === "revenue" ? maxRev : maxOrd;
               const pct = (val / max) * 100;
               return (
-                <div key={m.month} className="flex-1 flex flex-col items-center gap-1.5">
-                  <div className="w-full flex flex-col justify-end" style={{ height: "100%" }}>
-                    <div
-                      className="w-full rounded-t-md bg-[#1b4332] hover:bg-[#2d6a4f] transition-colors cursor-pointer relative group"
-                      style={{ height: `${pct}%` }}
-                    >
-                      <div className="absolute -top-8 left-1/2 -translate-x-1/2 hidden group-hover:block bg-gray-900 text-white text-[10px] rounded-lg px-2 py-1 whitespace-nowrap z-10 shadow-lg">
-                        {activeChart === "revenue" ? formatPrice(val) : `${val} orders`}
-                      </div>
-                    </div>
-                  </div>
-                  <span className="text-[9px] text-gray-400 font-medium">{m.month}</span>
+                <div key={m.month} style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: 6, height: "100%", justifyContent: "flex-end" }}>
+                  <div
+                    title={chart === "revenue" ? formatPrice(val) : `${val} orders`}
+                    style={{
+                      width: "100%", borderRadius: "4px 4px 0 0",
+                      height: `${pct}%`, minHeight: 4,
+                      background: "#1b4332", cursor: "pointer",
+                      transition: "opacity 0.15s",
+                    }}
+                    onMouseEnter={(e) => (e.currentTarget.style.opacity = "0.7")}
+                    onMouseLeave={(e) => (e.currentTarget.style.opacity = "1")}
+                  />
+                  <span style={{ fontSize: 9, color: "#94a3b8", fontWeight: 500 }}>{m.month}</span>
                 </div>
               );
             })}
           </div>
-          <div className="mt-4 flex gap-6 text-xs text-gray-500 border-t border-gray-50 pt-4">
-            <span>Total: <strong className="text-gray-700">{activeChart === "revenue" ? formatPrice(totalRevenue) : `${totalOrders} orders`}</strong></span>
-            <span>Avg/month: <strong className="text-gray-700">{activeChart === "revenue" ? formatPrice(Math.round(totalRevenue / 12)) : `${Math.round(totalOrders / 12)} orders`}</strong></span>
-          </div>
         </div>
 
-        {/* Category pie-like chart */}
-        <div className="rounded-2xl bg-white border border-gray-100 p-6 shadow-sm">
-          <h2 className="font-bold text-gray-800 mb-6">Sales by Category</h2>
-          <div className="space-y-4">
+        {/* Category bars */}
+        <div style={{ background: "white", borderRadius: 16, padding: 24, border: "1px solid #f1f5f9", boxShadow: "0 1px 3px rgba(0,0,0,0.04)" }}>
+          <h2 style={{ fontSize: 15, fontWeight: 700, color: "#0f172a", margin: "0 0 20px" }}>Sales by Category</h2>
+          <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
             {CATEGORY_SALES.map((c) => (
               <div key={c.name}>
-                <div className="flex justify-between text-sm mb-1.5">
-                  <div className="flex items-center gap-2">
-                    <div className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: c.color }} />
-                    <span className="font-medium text-gray-700">{c.name}</span>
+                <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 6 }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                    <div style={{ width: 10, height: 10, borderRadius: "50%", background: c.color }} />
+                    <span style={{ fontSize: 13, fontWeight: 500, color: "#374151" }}>{c.name}</span>
                   </div>
-                  <span className="font-bold text-gray-600">{c.value}%</span>
+                  <span style={{ fontSize: 13, fontWeight: 700, color: "#374151" }}>{c.value}%</span>
                 </div>
-                <div className="h-2 rounded-full bg-gray-100 overflow-hidden">
-                  <div
-                    className="h-full rounded-full"
-                    style={{ width: `${c.value}%`, backgroundColor: c.color }}
-                  />
+                <div style={{ height: 8, borderRadius: 4, background: "#f1f5f9", overflow: "hidden" }}>
+                  <div style={{ width: `${c.value}%`, height: "100%", borderRadius: 4, background: c.color }} />
                 </div>
               </div>
             ))}
           </div>
-          {/* Summary */}
-          <div className="mt-6 grid grid-cols-2 gap-3">
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, marginTop: 20 }}>
             {CATEGORY_SALES.map((c) => (
-              <div key={c.name} className="rounded-xl p-3" style={{ backgroundColor: `${c.color}15` }}>
-                <p className="text-xs font-semibold" style={{ color: c.color }}>{c.name}</p>
-                <p className="text-lg font-bold text-gray-800">{c.value}%</p>
+              <div key={c.name} style={{ padding: "10px 12px", borderRadius: 10, background: `${c.color}18` }}>
+                <p style={{ fontSize: 11, fontWeight: 600, color: c.color, margin: 0 }}>{c.name}</p>
+                <p style={{ fontSize: 18, fontWeight: 700, color: "#0f172a", margin: "2px 0 0" }}>{c.value}%</p>
               </div>
             ))}
           </div>
@@ -147,89 +136,77 @@ export default function AdminDashboard() {
       </div>
 
       {/* Bottom row */}
-      <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
 
         {/* Recent orders */}
-        <div className="rounded-2xl bg-white border border-gray-100 shadow-sm overflow-hidden">
-          <div className="flex items-center justify-between px-6 py-4 border-b border-gray-50">
-            <h2 className="font-bold text-gray-800 flex items-center gap-2">
-              <Clock className="h-4 w-4 text-[#1b4332]" /> Recent Orders
+        <div style={{ background: "white", borderRadius: 16, border: "1px solid #f1f5f9", overflow: "hidden", boxShadow: "0 1px 3px rgba(0,0,0,0.04)" }}>
+          <div style={{ padding: "16px 20px", borderBottom: "1px solid #f8fafc", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+            <h2 style={{ fontSize: 15, fontWeight: 700, color: "#0f172a", margin: 0, display: "flex", alignItems: "center", gap: 8 }}>
+              <Clock size={15} color="#1b4332" /> Recent Orders
             </h2>
-            <a href="/dashboard/orders" className="text-xs font-medium text-[#1b4332] hover:underline">View all</a>
+            <a href="/dashboard/orders" style={{ fontSize: 12, color: "#1b4332", textDecoration: "none", fontWeight: 500 }}>View all</a>
           </div>
-          <div className="divide-y divide-gray-50">
-            {ORDERS.slice(0, 5).map((order) => (
-              <div key={order.id} className="flex items-center justify-between px-6 py-3.5 hover:bg-gray-50 transition-colors">
+          {ORDERS.slice(0, 5).map((o) => {
+            const st = STATUS_STYLE[o.status] ?? STATUS_STYLE.pending;
+            return (
+              <div key={o.id} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 20px", borderBottom: "1px solid #f8fafc" }}>
                 <div>
-                  <p className="text-sm font-semibold text-gray-800">{order.orderNumber}</p>
-                  <p className="text-xs text-gray-400">{order.customer} · {order.city}</p>
+                  <p style={{ fontSize: 13, fontWeight: 600, color: "#0f172a", margin: 0 }}>{o.orderNumber}</p>
+                  <p style={{ fontSize: 11, color: "#94a3b8", margin: "2px 0 0" }}>{o.customer} · {o.city}</p>
                 </div>
-                <div className="text-right">
-                  <p className="text-sm font-bold text-[#1b4332]">{formatPrice(order.total)}</p>
-                  <span className={cn("text-[10px] font-semibold px-2 py-0.5 rounded-full capitalize", STATUS_STYLE[order.status])}>
-                    {order.status}
+                <div style={{ textAlign: "right" }}>
+                  <p style={{ fontSize: 13, fontWeight: 700, color: "#1b4332", margin: 0 }}>{formatPrice(o.total)}</p>
+                  <span style={{ fontSize: 10, fontWeight: 600, padding: "2px 8px", borderRadius: 20, background: st.bg, color: st.color, textTransform: "capitalize" }}>
+                    {o.status}
                   </span>
                 </div>
               </div>
-            ))}
-          </div>
+            );
+          })}
         </div>
 
-        {/* Right column: low stock + top products */}
-        <div className="space-y-5">
+        {/* Right: low stock + top products */}
+        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+
           {/* Low stock */}
-          <div className="rounded-2xl bg-white border border-gray-100 p-5 shadow-sm">
-            <h2 className="font-bold text-gray-800 flex items-center gap-2 mb-4">
-              <AlertTriangle className="h-4 w-4 text-amber-500" /> Low Stock Alerts
+          <div style={{ background: "white", borderRadius: 16, padding: 20, border: "1px solid #f1f5f9", boxShadow: "0 1px 3px rgba(0,0,0,0.04)" }}>
+            <h2 style={{ fontSize: 15, fontWeight: 700, color: "#0f172a", margin: "0 0 14px", display: "flex", alignItems: "center", gap: 8 }}>
+              <AlertTriangle size={15} color="#f59e0b" /> Low Stock Alerts
             </h2>
             {lowStock.length === 0 ? (
-              <div className="flex items-center gap-2 text-green-600">
-                <CheckCircle className="h-4 w-4" />
-                <span className="text-sm">All products are well stocked</span>
+              <div style={{ display: "flex", alignItems: "center", gap: 8, color: "#16a34a", fontSize: 13 }}>
+                <CheckCircle size={15} /> All products well stocked
               </div>
-            ) : (
-              <div className="space-y-2">
-                {lowStock.map((p) => (
-                  <div key={p.id} className="flex items-center justify-between p-3 rounded-xl bg-amber-50">
-                    <div>
-                      <p className="text-sm font-medium text-gray-700">{p.name}</p>
-                      <p className="text-xs text-gray-400">SKU: {p.sku}</p>
-                    </div>
-                    <span className={cn(
-                      "text-xs font-bold px-2.5 py-1 rounded-full",
-                      p.stock < 10 ? "bg-red-100 text-red-600" : "bg-amber-100 text-amber-600"
-                    )}>
-                      {p.stock} left
-                    </span>
-                  </div>
-                ))}
+            ) : lowStock.map((p) => (
+              <div key={p.id} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "10px 12px", borderRadius: 10, background: "#fffbeb", marginBottom: 6 }}>
+                <div>
+                  <p style={{ fontSize: 13, fontWeight: 500, color: "#374151", margin: 0 }}>{p.name}</p>
+                  <p style={{ fontSize: 11, color: "#94a3b8", margin: 0 }}>SKU: {p.sku}</p>
+                </div>
+                <span style={{ fontSize: 11, fontWeight: 700, padding: "3px 10px", borderRadius: 20, background: p.stock < 10 ? "#fee2e2" : "#fef9c3", color: p.stock < 10 ? "#dc2626" : "#ca8a04" }}>
+                  {p.stock} left
+                </span>
               </div>
-            )}
+            ))}
           </div>
 
           {/* Top products */}
-          <div className="rounded-2xl bg-white border border-gray-100 p-5 shadow-sm">
-            <h2 className="font-bold text-gray-800 flex items-center gap-2 mb-4">
-              <Package className="h-4 w-4 text-[#1b4332]" /> Top Products
+          <div style={{ background: "white", borderRadius: 16, padding: 20, border: "1px solid #f1f5f9", boxShadow: "0 1px 3px rgba(0,0,0,0.04)" }}>
+            <h2 style={{ fontSize: 15, fontWeight: 700, color: "#0f172a", margin: "0 0 14px", display: "flex", alignItems: "center", gap: 8 }}>
+              <Package size={15} color="#1b4332" /> Top Products
             </h2>
-            <div className="space-y-3">
-              {PRODUCTS.map((p, i) => (
-                <div key={p.id} className="flex items-center gap-3">
-                  <div className="h-7 w-7 rounded-lg bg-[#1b4332]/10 flex items-center justify-center text-[#1b4332] text-xs font-bold">
-                    {i + 1}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-gray-700 truncate">{p.name}</p>
-                    <div className="flex items-center gap-2 mt-0.5">
-                      <span className="text-[10px] text-amber-500">⭐ {p.rating}</span>
-                      <span className="text-[10px] text-gray-400">·</span>
-                      <span className="text-[10px] text-gray-400">{p.reviews} reviews</span>
-                    </div>
-                  </div>
-                  <span className="text-sm font-bold text-[#1b4332]">{formatPrice(p.price)}</span>
+            {PRODUCTS.map((p, i) => (
+              <div key={p.id} style={{ display: "flex", alignItems: "center", gap: 12, padding: "8px 0", borderBottom: i < PRODUCTS.length - 1 ? "1px solid #f8fafc" : "none" }}>
+                <div style={{ width: 28, height: 28, borderRadius: 8, background: "rgba(27,67,50,0.1)", display: "flex", alignItems: "center", justifyContent: "center", color: "#1b4332", fontWeight: 700, fontSize: 12, flexShrink: 0 }}>
+                  {i + 1}
                 </div>
-              ))}
-            </div>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <p style={{ fontSize: 13, fontWeight: 500, color: "#374151", margin: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{p.name}</p>
+                  <p style={{ fontSize: 11, color: "#f59e0b", margin: "2px 0 0" }}>⭐ {p.rating} · {p.reviews} reviews</p>
+                </div>
+                <span style={{ fontSize: 13, fontWeight: 700, color: "#1b4332", flexShrink: 0 }}>{formatPrice(p.price)}</span>
+              </div>
+            ))}
           </div>
         </div>
       </div>

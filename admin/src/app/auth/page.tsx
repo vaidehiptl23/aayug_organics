@@ -1,16 +1,15 @@
 "use client";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Eye, EyeOff, Lock, Mail, ShieldCheck } from "lucide-react";
 import { adminLogin, setAdminSession } from "@/lib/auth";
 
 export default function AdminLoginPage() {
   const router = useRouter();
-  const [email, setEmail]     = useState("admin@aayugorganics.com");
+  const [email, setEmail]       = useState("admin@aayugorganics.com");
   const [password, setPassword] = useState("Admin@123");
-  const [showPwd, setShowPwd] = useState(false);
-  const [error, setError]     = useState("");
-  const [loading, setLoading] = useState(false);
+  const [showPwd, setShowPwd]   = useState(false);
+  const [error, setError]       = useState("");
+  const [loading, setLoading]   = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -27,76 +26,140 @@ export default function AdminLoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#1b4332] flex items-center justify-center px-4">
-      <div className="w-full max-w-md">
+    <div style={{
+      minHeight: "100vh",
+      background: "#1b4332",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      padding: 24,
+      fontFamily: "system-ui, -apple-system, sans-serif",
+    }}>
+      <div style={{ width: "100%", maxWidth: 420 }}>
+
         {/* Logo */}
-        <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center h-16 w-16 rounded-2xl bg-white/10 mb-4">
-            <span className="text-3xl">🌿</span>
-          </div>
-          <h1 className="text-2xl font-bold text-white">Aayug Organics</h1>
-          <p className="text-white/60 text-sm mt-1">Admin Panel — Restricted Access</p>
+        <div style={{ textAlign: "center", marginBottom: 32 }}>
+          <div style={{
+            width: 64, height: 64, borderRadius: 16,
+            background: "rgba(255,255,255,0.12)",
+            display: "flex", alignItems: "center", justifyContent: "center",
+            margin: "0 auto 16px", fontSize: 30,
+          }}>🌿</div>
+          <h1 style={{ color: "white", fontSize: 22, fontWeight: 700, margin: 0 }}>Aayug Organics</h1>
+          <p style={{ color: "rgba(255,255,255,0.5)", fontSize: 13, margin: "6px 0 0" }}>Admin Panel · Restricted Access</p>
         </div>
 
-        <div className="bg-white rounded-2xl p-8 shadow-2xl">
-          <div className="flex items-center gap-2 mb-6">
-            <ShieldCheck className="h-5 w-5 text-[#1b4332]" />
-            <h2 className="font-bold text-gray-800">Sign in to Admin</h2>
-          </div>
+        {/* Card */}
+        <div style={{
+          background: "white",
+          borderRadius: 20,
+          padding: 32,
+          boxShadow: "0 20px 60px rgba(0,0,0,0.3)",
+        }}>
+          <h2 style={{ fontSize: 18, fontWeight: 700, color: "#0f172a", margin: "0 0 24px", display: "flex", alignItems: "center", gap: 8 }}>
+            🔐 Sign in to Admin
+          </h2>
 
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+
             {/* Email */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1.5">Email Address</label>
-              <div className="relative">
-                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
-                <input
-                  type="email" value={email} onChange={(e) => setEmail(e.target.value)} required
-                  className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-xl text-sm focus:outline-none focus:border-[#1b4332] focus:ring-2 focus:ring-[#1b4332]/20"
-                  placeholder="admin@aayugorganics.com"
-                />
-              </div>
+              <label style={{ display: "block", fontSize: 13, fontWeight: 600, color: "#374151", marginBottom: 6 }}>
+                Email Address
+              </label>
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                placeholder="admin@aayugorganics.com"
+                style={{
+                  width: "100%", padding: "10px 14px", fontSize: 14,
+                  border: "1.5px solid #e2e8f0", borderRadius: 10,
+                  outline: "none", boxSizing: "border-box",
+                  fontFamily: "inherit",
+                }}
+                onFocus={(e) => (e.target.style.borderColor = "#1b4332")}
+                onBlur={(e) => (e.target.style.borderColor = "#e2e8f0")}
+              />
             </div>
 
             {/* Password */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1.5">Password</label>
-              <div className="relative">
-                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+              <label style={{ display: "block", fontSize: 13, fontWeight: 600, color: "#374151", marginBottom: 6 }}>
+                Password
+              </label>
+              <div style={{ position: "relative" }}>
                 <input
-                  type={showPwd ? "text" : "password"} value={password} onChange={(e) => setPassword(e.target.value)} required
-                  className="w-full pl-10 pr-10 py-2.5 border border-gray-300 rounded-xl text-sm focus:outline-none focus:border-[#1b4332] focus:ring-2 focus:ring-[#1b4332]/20"
+                  type={showPwd ? "text" : "password"}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
                   placeholder="Enter admin password"
+                  style={{
+                    width: "100%", padding: "10px 44px 10px 14px", fontSize: 14,
+                    border: "1.5px solid #e2e8f0", borderRadius: 10,
+                    outline: "none", boxSizing: "border-box",
+                    fontFamily: "inherit",
+                  }}
+                  onFocus={(e) => (e.target.style.borderColor = "#1b4332")}
+                  onBlur={(e) => (e.target.style.borderColor = "#e2e8f0")}
                 />
-                <button type="button" onClick={() => setShowPwd(!showPwd)} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
-                  {showPwd ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                </button>
+                <button
+                  type="button"
+                  onClick={() => setShowPwd(!showPwd)}
+                  style={{
+                    position: "absolute", right: 12, top: "50%", transform: "translateY(-50%)",
+                    background: "none", border: "none", cursor: "pointer",
+                    fontSize: 14, color: "#94a3b8",
+                  }}
+                >{showPwd ? "🙈" : "👁️"}</button>
               </div>
             </div>
 
+            {/* Error */}
             {error && (
-              <div className="rounded-xl bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-600">
-                {error}
-              </div>
+              <div style={{
+                background: "#fef2f2", border: "1px solid #fecaca",
+                borderRadius: 10, padding: "10px 14px",
+                fontSize: 13, color: "#dc2626",
+              }}>⚠️ {error}</div>
             )}
 
+            {/* Submit */}
             <button
-              type="submit" disabled={loading}
-              className="w-full bg-[#1b4332] text-white py-3 rounded-xl font-semibold text-sm hover:bg-[#2d6a4f] transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+              type="submit"
+              disabled={loading}
+              style={{
+                width: "100%", padding: "12px", background: "#1b4332",
+                color: "white", border: "none", borderRadius: 12,
+                fontSize: 14, fontWeight: 600, cursor: loading ? "not-allowed" : "pointer",
+                opacity: loading ? 0.7 : 1, marginTop: 4,
+                display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
+                fontFamily: "inherit",
+              }}
             >
-              {loading ? (
-                <span className="h-4 w-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-              ) : (
-                <><ShieldCheck className="h-4 w-4" /> Sign In to Admin</>
-              )}
+              {loading
+                ? <span style={{ display: "inline-block", width: 16, height: 16, border: "2px solid rgba(255,255,255,0.3)", borderTopColor: "white", borderRadius: "50%", animation: "spin 0.8s linear infinite" }} />
+                : "🔐 Sign In to Admin"
+              }
             </button>
           </form>
 
-          <p className="mt-4 text-center text-xs text-gray-400">
-            🔒 This page is restricted to administrators only
+          <p style={{ fontSize: 12, color: "#94a3b8", textAlign: "center", marginTop: 16 }}>
+            🔒 Restricted to administrators only
           </p>
+
+          {/* Demo hint */}
+          <div style={{ background: "#f0fdf4", borderRadius: 10, padding: "10px 14px", marginTop: 12 }}>
+            <p style={{ fontSize: 12, color: "#16a34a", margin: 0 }}>
+              <strong>Demo:</strong> admin@aayugorganics.com / Admin@123
+            </p>
+          </div>
         </div>
       </div>
+
+      <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
     </div>
   );
 }

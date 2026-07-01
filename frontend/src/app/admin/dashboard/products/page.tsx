@@ -1,8 +1,8 @@
 "use client";
 import { useState } from "react";
-import { PRODUCTS } from "@/data/mock";
+import { PRODUCTS } from "@/data/admin-mock";
 import { formatPrice } from "@/lib/utils";
-import { toast } from "@/lib/toast";
+import { toast } from "@/lib/admin-toast";
 
 type Product = typeof PRODUCTS[0];
 

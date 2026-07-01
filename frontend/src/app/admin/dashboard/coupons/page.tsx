@@ -1,6 +1,6 @@
 "use client";
 import { useState } from "react";
-import { toast } from "@/lib/toast";
+import { toast } from "@/lib/admin-toast";
 
 type Coupon = { id: string; code: string; type: "%" | "₹"; value: number; minOrder: number; limit: number; used: number; active: boolean; expires: string };
 

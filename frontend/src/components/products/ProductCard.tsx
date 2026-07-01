@@ -94,14 +94,13 @@ export function ProductCard({ product, className }: ProductCardProps) {
             >
               <Heart className={cn("h-4 w-4", inWishlist && "fill-current")} />
             </button>
-            <Link
-              href={`/products/${product.slug}`}
+            <button
               className="flex h-8 w-8 items-center justify-center rounded-full bg-white shadow-md text-gray-400 hover:text-[#1b4332] transition-colors"
               aria-label="Quick view"
-              onClick={(e) => e.stopPropagation()}
+              onClick={(e) => { e.preventDefault(); window.location.href = `/products/${product.slug}`; }}
             >
               <Eye className="h-4 w-4" />
-            </Link>
+            </button>
           </div>
           {/* Hover overlay */}
           <div className="absolute inset-0 bg-black/0 transition-colors group-hover:bg-black/5 rounded-t-2xl" />

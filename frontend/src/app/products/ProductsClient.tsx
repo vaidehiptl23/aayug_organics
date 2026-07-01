@@ -1,14 +1,14 @@
 "use client";
 import { useState, useMemo, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
-import { SlidersHorizontal, X, ChevronDown, ChevronUp, Search, LayoutGrid, List } from "lucide-react";
-import { products, categories } from "@/data/products";
+import { SlidersHorizontal, X, Search, LayoutGrid, List } from "lucide-react";
+import { categories } from "@/data/products";
+import { useProducts } from "@/hooks/useProducts";
 import { ProductCard } from "@/components/products/ProductCard";
 import { ProductCardSkeleton } from "@/components/ui/Skeleton";
 import { Button } from "@/components/ui/Button";
 import { Select } from "@/components/ui/Select";
 import { cn } from "@/lib/utils";
-import { Product } from "@/types";
 
 const SORT_OPTIONS = [
   { value: "newest", label: "Newest First" },
@@ -27,90 +27,50 @@ const PRICE_RANGES = [
 
 const PER_PAGE = 8;
 
-function sortProducts(list: Product[], sort: string): Product[] {
-  return [...list].sort((a, b) => {
-    switch (sort) {
-      case "price_asc": return a.price - b.price;
-      case "price_desc": return b.price - a.price;
-      case "rating": return b.rating - a.rating;
-      case "popularity": return b.reviewCount - a.reviewCount;
-      default: return 0;
-    }
-  });
-}
-
 export function ProductsClient() {
   const searchParams = useSearchParams();
-  const [loading, setLoading] = useState(true);
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [sort, setSort] = useState("newest");
   const [page, setPage] = useState(1);
   const [view, setView] = useState<"grid" | "list">("grid");
   const [search, setSearch] = useState(searchParams.get("search") ?? "");
-
-  // Filter state
   const [selectedCategory, setSelectedCategory] = useState(searchParams.get("category") ?? "");
   const [selectedPriceRange, setSelectedPriceRange] = useState<number | null>(null);
   const [minRating, setMinRating] = useState(0);
   const [inStockOnly, setInStockOnly] = useState(false);
 
-  // Simulate loading
-  useEffect(() => {
-    setLoading(true);
-    const t = setTimeout(() => setLoading(false), 600);
-    return () => clearTimeout(t);
-  }, [selectedCategory, selectedPriceRange, minRating, inStockOnly, search]);
+  // Build API params
+  const apiParams = useMemo(() => {
+    const p: Record<string, string> = { page: String(page), limit: String(PER_PAGE), sort };
+    if (search)           p.search   = search;
+    if (selectedCategory) p.category = selectedCategory;
+    if (inStockOnly)      p.inStock  = "true";
+    if (minRating > 0)    p.minRating = String(minRating);
+    if (selectedPriceRange !== null) {
+      p.minPrice = String(PRICE_RANGES[selectedPriceRange].min);
+      if (PRICE_RANGES[selectedPriceRange].max !== Infinity)
+        p.maxPrice = String(PRICE_RANGES[selectedPriceRange].max);
+    }
+    return p;
+  }, [page, sort, search, selectedCategory, inStockOnly, minRating, selectedPriceRange]);
+
+  const { products: filtered, total, loading } = useProducts(apiParams);
+  const totalPages = Math.ceil(total / PER_PAGE);
 
   // Sync URL params
   useEffect(() => {
     const cat = searchParams.get("category") ?? "";
+    const q   = searchParams.get("search") ?? "";
     setSelectedCategory(cat);
+    setSearch(q);
+    setPage(1);
   }, [searchParams]);
 
-  const filtered = useMemo(() => {
-    let list = products;
-    if (search) {
-      const q = search.toLowerCase();
-      list = list.filter(
-        (p) =>
-          p.name.toLowerCase().includes(q) ||
-          p.category.toLowerCase().includes(q) ||
-          p.description.toLowerCase().includes(q)
-      );
-    }
-    if (selectedCategory) {
-      list = list.filter((p) => p.categorySlug === selectedCategory);
-    }
-    if (selectedPriceRange !== null) {
-      const range = PRICE_RANGES[selectedPriceRange];
-      list = list.filter((p) => p.price >= range.min && p.price <= range.max);
-    }
-    if (minRating > 0) {
-      list = list.filter((p) => p.rating >= minRating);
-    }
-    if (inStockOnly) {
-      list = list.filter((p) => p.inStock);
-    }
-    return sortProducts(list, sort);
-  }, [search, selectedCategory, selectedPriceRange, minRating, inStockOnly, sort]);
-
-  const totalPages = Math.ceil(filtered.length / PER_PAGE);
-  const paginated = filtered.slice((page - 1) * PER_PAGE, page * PER_PAGE);
-
-  const activeFilterCount = [
-    selectedCategory,
-    selectedPriceRange !== null,
-    minRating > 0,
-    inStockOnly,
-  ].filter(Boolean).length;
+  const activeFilterCount = [selectedCategory, selectedPriceRange !== null, minRating > 0, inStockOnly].filter(Boolean).length;
 
   const clearFilters = () => {
-    setSelectedCategory("");
-    setSelectedPriceRange(null);
-    setMinRating(0);
-    setInStockOnly(false);
-    setSearch("");
-    setPage(1);
+    setSelectedCategory(""); setSelectedPriceRange(null);
+    setMinRating(0); setInStockOnly(false); setSearch(""); setPage(1);
   };
 
   const FilterPanel = () => (
@@ -331,7 +291,7 @@ export function ProductsClient() {
               <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
                 {Array.from({ length: 6 }).map((_, i) => <ProductCardSkeleton key={i} />)}
               </div>
-            ) : paginated.length === 0 ? (
+            ) : filtered.length === 0 ? (
               <div className="flex flex-col items-center gap-4 py-20 text-center">
                 <span className="text-6xl">🔍</span>
                 <h3 className="text-xl font-semibold text-gray-700 dark:text-white">No products found</h3>
@@ -345,7 +305,7 @@ export function ProductsClient() {
                   ? "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3"
                   : "flex flex-col"
               )}>
-                {paginated.map((product) => (
+                {filtered.map((product) => (
                   <ProductCard key={product.id} product={product} />
                 ))}
               </div>

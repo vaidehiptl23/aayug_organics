@@ -1,6 +1,6 @@
 "use client";
 import { useState } from "react";
-import { CUSTOMERS } from "@/data/mock";
+import { CUSTOMERS } from "@/data/admin-mock";
 import { formatPrice } from "@/lib/utils";
 
 export default function AdminCustomersPage() {

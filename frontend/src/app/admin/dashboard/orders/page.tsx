@@ -1,8 +1,8 @@
 "use client";
 import { useState } from "react";
-import { ORDERS } from "@/data/mock";
+import { ORDERS } from "@/data/admin-mock";
 import { formatPrice } from "@/lib/utils";
-import { toast } from "@/lib/toast";
+import { toast } from "@/lib/admin-toast";
 
 type Order = typeof ORDERS[0];
 

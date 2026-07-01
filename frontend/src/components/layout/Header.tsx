@@ -165,6 +165,11 @@ export function Header() {
                     <Link href="/dashboard/profile" className="flex items-center gap-2 px-4 py-2 text-sm text-gray-600 hover:bg-gray-50 hover:text-[#1b4332] dark:text-gray-300 dark:hover:bg-gray-700">
                       <Settings className="h-4 w-4" /> Settings
                     </Link>
+                    {user?.email === "admin@aayugorganics.com" && (
+                      <Link href="/admin/dashboard" className="flex items-center gap-2 px-4 py-2 text-sm font-semibold text-[#1b4332] hover:bg-green-50 dark:text-green-400">
+                        🛡️ Admin Panel
+                      </Link>
+                    )}
                     <hr className="my-1 border-gray-100 dark:border-gray-700" />
                     <button
                       onClick={() => { logout(); setUserMenuOpen(false); }}

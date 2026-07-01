@@ -10,15 +10,15 @@ type Product = typeof PRODUCTS[0] & { images?: ProductImage[] };
 
 // ── Ghee images from the actual product photos ──
 const GHEE_IMAGES: ProductImage[] = [
-  { id: "g1", url: "/products/ghee/ghee-front.jpg",     alt: "A2 Gir Cow Ghee - Front View",    isPrimary: true  },
-  { id: "g2", url: "/products/ghee/ghee-back.jpg",      alt: "A2 Gir Cow Ghee - Back Label",    isPrimary: false },
-  { id: "g3", url: "/products/ghee/ghee-banner.jpg",    alt: "Ghee - Health Benefits Banner",   isPrimary: false },
-  { id: "g4", url: "/products/ghee/ghee-bilona.jpg",    alt: "Bilona Method Process",           isPrimary: false },
-  { id: "g5", url: "/products/ghee/ghee-why.jpg",       alt: "Why Aayug Ghee is Better",        isPrimary: false },
-  { id: "g6", url: "/products/ghee/ghee-choose.jpg",    alt: "Why Choose Aayug",                isPrimary: false },
-  { id: "g7", url: "/products/ghee/ghee-nutrition.jpg", alt: "Nutrition Facts",                 isPrimary: false },
-  { id: "g8", url: "/products/ghee/ghee-process.jpg",   alt: "Traditional Bilona Process",      isPrimary: false },
-  { id: "g9", url: "/products/ghee/ghee-benefits.jpg",  alt: "Packed With Health Benefits",     isPrimary: false },
+  { id: "g1", url: "/products/ghee/ghee-front.jpeg",     alt: "A2 Gir Cow Ghee - Front View",    isPrimary: true  },
+  { id: "g2", url: "/products/ghee/ghee-back.jpeg",      alt: "A2 Gir Cow Ghee - Back Label",    isPrimary: false },
+  { id: "g3", url: "/products/ghee/ghee-banner.jpeg",    alt: "Ghee - Health Benefits Banner",   isPrimary: false },
+  { id: "g4", url: "/products/ghee/ghee-bilona.jpeg",    alt: "Bilona Method Process",           isPrimary: false },
+  { id: "g5", url: "/products/ghee/ghee-why.jpeg",       alt: "Why Aayug Ghee is Better",        isPrimary: false },
+  { id: "g6", url: "/products/ghee/ghee-choose.jpeg",    alt: "Why Choose Aayug",                isPrimary: false },
+  { id: "g7", url: "/products/ghee/ghee-nutrition.jpeg", alt: "Nutrition Facts",                 isPrimary: false },
+  { id: "g8", url: "/products/ghee/ghee-process.jpeg",   alt: "Traditional Bilona Process",      isPrimary: false },
+  { id: "g9", url: "/products/ghee/ghee-benefits.jpeg",  alt: "Packed With Health Benefits",     isPrimary: false },
 ];
 
 const INITIAL_PRODUCTS: Product[] = PRODUCTS.map((p) => ({

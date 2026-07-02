@@ -1,10 +1,11 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import {
   Heart, ShoppingCart, Zap, ChevronRight, Truck,
   RotateCcw, ShieldCheck, Minus, Plus, Star,
+  ChevronLeft,
 } from "lucide-react";
 import { Product, Review } from "@/types";
 import { useCartStore } from "@/store/cart.store";
@@ -21,8 +22,9 @@ interface Props { product: Product; }
 
 export function ProductDetailClient({ product }: Props) {
   const [selectedImage, setSelectedImage] = useState(0);
-  const [quantity, setQuantity] = useState(1);
-  const [activeTab, setActiveTab] = useState<"description" | "reviews" | "shipping">("description");
+  const [quantity, setQuantity]           = useState(1);
+  const [activeTab, setActiveTab]         = useState<"description" | "reviews" | "shipping">("description");
+  const [autoplay, setAutoplay]           = useState(true);
 
   const addItem = useCartStore((s) => s.addItem);
   const { toggle, isInWishlist } = useWishlistStore();
@@ -31,6 +33,31 @@ export function ProductDetailClient({ product }: Props) {
   const productReviews: Review[] = allReviews.slice(0, 4);
   const discountPct = product.originalPrice
     ? calcDiscountPct(product.originalPrice, product.price) : 0;
+
+  const images = product.images;
+
+  // Auto-scroll images every 3 seconds
+  const nextImage = useCallback(() => {
+    if (images.length > 1) {
+      setSelectedImage((i) => (i + 1) % images.length);
+    }
+  }, [images.length]);
+
+  const prevImage = () => {
+    setAutoplay(false);
+    setSelectedImage((i) => (i - 1 + images.length) % images.length);
+  };
+
+  const goToImage = (idx: number) => {
+    setAutoplay(false);
+    setSelectedImage(idx);
+  };
+
+  useEffect(() => {
+    if (!autoplay || images.length <= 1) return;
+    const t = setInterval(nextImage, 3000);
+    return () => clearInterval(t);
+  }, [autoplay, nextImage, images.length]);
 
   const handleAddToCart = () => {
     addItem(product, quantity);
@@ -63,13 +90,14 @@ export function ProductDetailClient({ product }: Props) {
         <div className="grid grid-cols-1 gap-12 lg:grid-cols-2">
           {/* Image Gallery */}
           <div className="space-y-4">
-            <div className="relative overflow-hidden rounded-2xl bg-gray-50 dark:bg-gray-800">
+            {/* Main image with prev/next arrows */}
+            <div className="relative overflow-hidden rounded-2xl bg-gray-50 dark:bg-gray-800 group">
               <Image
-                src={product.images[selectedImage]?.url ?? "/placeholder.jpg"}
-                alt={product.images[selectedImage]?.alt ?? product.name}
+                src={images[selectedImage]?.url ?? "/placeholder.jpg"}
+                alt={images[selectedImage]?.alt ?? product.name}
                 width={600}
                 height={600}
-                className="h-96 w-full object-cover lg:h-[500px]"
+                className="h-96 w-full object-cover lg:h-[500px] transition-all duration-500"
                 priority
                 unoptimized
               />
@@ -83,23 +111,61 @@ export function ProductDetailClient({ product }: Props) {
                   <span className="rounded-xl bg-white px-6 py-3 text-lg font-bold text-gray-800">Out of Stock</span>
                 </div>
               )}
+
+              {/* Prev/Next arrows — show on hover */}
+              {images.length > 1 && (
+                <>
+                  <button
+                    onClick={prevImage}
+                    className="absolute left-3 top-1/2 -translate-y-1/2 flex h-9 w-9 items-center justify-center rounded-full bg-white/80 shadow-md text-gray-700 opacity-0 group-hover:opacity-100 transition-opacity hover:bg-white"
+                    aria-label="Previous image"
+                  >
+                    <ChevronLeft className="h-5 w-5" />
+                  </button>
+                  <button
+                    onClick={() => { setAutoplay(false); setSelectedImage((i) => (i + 1) % images.length); }}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 flex h-9 w-9 items-center justify-center rounded-full bg-white/80 shadow-md text-gray-700 opacity-0 group-hover:opacity-100 transition-opacity hover:bg-white"
+                    aria-label="Next image"
+                  >
+                    <ChevronRight className="h-5 w-5" />
+                  </button>
+                </>
+              )}
+
+              {/* Dot indicators */}
+              {images.length > 1 && (
+                <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-1.5">
+                  {images.map((_, i) => (
+                    <button
+                      key={i}
+                      onClick={() => goToImage(i)}
+                      className={cn(
+                        "h-1.5 rounded-full transition-all",
+                        i === selectedImage ? "w-5 bg-[#1b4332]" : "w-1.5 bg-white/70"
+                      )}
+                      aria-label={`Image ${i + 1}`}
+                    />
+                  ))}
+                </div>
+              )}
             </div>
-            {/* Thumbnails */}
-            {product.images.length > 1 && (
-              <div className="flex gap-3">
-                {product.images.map((img, i) => (
+
+            {/* Thumbnails — horizontal scroll */}
+            {images.length > 1 && (
+              <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
+                {images.map((img, i) => (
                   <button
                     key={img.id}
-                    onClick={() => setSelectedImage(i)}
+                    onClick={() => goToImage(i)}
                     className={cn(
-                      "h-20 w-20 overflow-hidden rounded-xl border-2 transition-all",
+                      "h-16 w-16 shrink-0 overflow-hidden rounded-xl border-2 transition-all",
                       i === selectedImage
-                        ? "border-[#1b4332] shadow-md"
-                        : "border-gray-200 hover:border-gray-400 dark:border-gray-700"
+                        ? "border-[#1b4332] shadow-md scale-105"
+                        : "border-gray-200 hover:border-gray-400 dark:border-gray-700 opacity-70 hover:opacity-100"
                     )}
                     aria-label={`View image ${i + 1}`}
                   >
-                    <Image src={img.url} alt={img.alt} width={80} height={80} className="h-full w-full object-cover" unoptimized />
+                    <Image src={img.url} alt={img.alt} width={64} height={64} className="h-full w-full object-cover" unoptimized />
                   </button>
                 ))}
               </div>

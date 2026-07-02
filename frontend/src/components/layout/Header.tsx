@@ -15,10 +15,7 @@ import { Button } from "@/components/ui/Button";
 const navLinks = [
   { href: "/", label: "Home" },
   { href: "/products", label: "Products" },
-  { href: "/products?category=ghee", label: "Ghee" },
-  { href: "/products?category=honey", label: "Honey" },
-  { href: "/products?category=oils", label: "Oils" },
-  { href: "/products?category=spices", label: "Spices" },
+  { href: "/", label: "Story" },
 ];
 
 export function Header() {
@@ -71,10 +68,31 @@ export function Header() {
           : "bg-white dark:bg-gray-900"
       )}
     >
-      {/* Top promo bar */}
-      <div className="bg-[#1b4332] py-1.5 text-center text-xs font-medium text-white">
-        🌿 Free shipping on orders above ₹999 &nbsp;|&nbsp; Use code{" "}
-        <span className="font-bold text-[#d4a373]">ORGANIC10</span> for 10% off
+      {/* Scrolling announcement banner */}
+      <div className="bg-[#1b4332] py-1.5 overflow-hidden">
+        <div className="flex animate-marquee whitespace-nowrap">
+          {[
+            "🌿 Free shipping on orders above ₹999",
+            "🍯 Use code ORGANIC10 for 10% off",
+            "🥛 100% Pure A2 Gir Cow Ghee — Traditional Bilona Method",
+            "🧂 Premium Himalayan Crystal Salt — 84+ Minerals",
+            "🌿 Lab-tested. FSSAI Certified. No Preservatives.",
+            "🚚 Fast delivery across India",
+            "🍯 Raw Forest Honey — Unfiltered & Unheated",
+          ].concat([
+            "🌿 Free shipping on orders above ₹999",
+            "🍯 Use code ORGANIC10 for 10% off",
+            "🥛 100% Pure A2 Gir Cow Ghee — Traditional Bilona Method",
+            "🧂 Premium Himalayan Crystal Salt — 84+ Minerals",
+            "🌿 Lab-tested. FSSAI Certified. No Preservatives.",
+            "🚚 Fast delivery across India",
+            "🍯 Raw Forest Honey — Unfiltered & Unheated",
+          ]).map((msg, i) => (
+            <span key={i} className="mx-8 text-xs font-medium text-white">
+              {msg}
+            </span>
+          ))}
+        </div>
       </div>
 
       <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 lg:px-8">

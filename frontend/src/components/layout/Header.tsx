@@ -13,9 +13,9 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/Button";
 
 const navLinks = [
-  { href: "/", label: "Home" },
+  { href: "/",        label: "Home"     },
   { href: "/products", label: "Products" },
-  { href: "/", label: "Story" },
+  { href: "/story",   label: "Story"    },
 ];
 
 export function Header() {
@@ -79,7 +79,6 @@ export function Header() {
             "🌿 Lab-tested. FSSAI Certified. No Preservatives.",
             "🚚 Fast delivery across India",
             "🍯 Raw Forest Honey — Unfiltered & Unheated",
-          ].concat([
             "🌿 Free shipping on orders above ₹999",
             "🍯 Use code ORGANIC10 for 10% off",
             "🥛 100% Pure A2 Gir Cow Ghee — Traditional Bilona Method",
@@ -87,7 +86,7 @@ export function Header() {
             "🌿 Lab-tested. FSSAI Certified. No Preservatives.",
             "🚚 Fast delivery across India",
             "🍯 Raw Forest Honey — Unfiltered & Unheated",
-          ]).map((msg, i) => (
+          ].map((msg, i) => (
             <span key={i} className="mx-8 text-xs font-medium text-white">
               {msg}
             </span>
@@ -107,9 +106,9 @@ export function Header() {
 
         {/* Desktop Nav */}
         <nav className="hidden items-center gap-6 lg:flex">
-          {navLinks.map((link) => (
+          {navLinks.map((link, i) => (
             <Link
-              key={link.href}
+              key={i}
               href={link.href}
               className="text-sm font-medium text-gray-600 transition-colors hover:text-[#1b4332] dark:text-gray-300 dark:hover:text-green-400"
             >
@@ -289,9 +288,9 @@ export function Header() {
       {mobileOpen && (
         <div className="border-t border-gray-100 bg-white px-4 py-4 dark:border-gray-700 dark:bg-gray-900 lg:hidden">
           <nav className="flex flex-col gap-1">
-            {navLinks.map((link) => (
+            {navLinks.map((link, i) => (
               <Link
-                key={link.href}
+                key={i}
                 href={link.href}
                 onClick={() => setMobileOpen(false)}
                 className="rounded-lg px-3 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 hover:text-[#1b4332] dark:text-gray-300 dark:hover:bg-gray-800"

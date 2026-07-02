@@ -1,8 +1,5 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import { Header } from "@/components/layout/Header";
-import { Footer } from "@/components/layout/Footer";
-import { ToastContainer } from "@/components/ui/Toast";
 
 export const metadata: Metadata = {
   title: {
@@ -10,8 +7,8 @@ export const metadata: Metadata = {
     template: "%s | Aayug Organics",
   },
   description:
-    "Discover 100% pure, organic A2 Gir Cow Ghee, Raw Honey, Cold-Pressed Oils, and Organic Spices. Farm-fresh, lab-tested products delivered to your doorstep.",
-  keywords: ["organic food", "A2 ghee", "raw honey", "cold-pressed oil", "organic spices", "ayurvedic"],
+    "Discover 100% pure, organic A2 Gir Cow Ghee, Raw Honey, Cold-Pressed Oils, and Organic Spices.",
+  keywords: ["organic food", "A2 ghee", "raw honey", "organic spices", "ayurvedic"],
   openGraph: {
     siteName: "Aayug Organics",
     locale: "en_IN",
@@ -19,18 +16,17 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+/**
+ * Root layout — minimal wrapper.
+ * The /admin route has its OWN layout (admin/layout.tsx) with its own
+ * <html><body> which overrides this one completely for admin pages.
+ * All other routes get Header + Footer via the template below.
+ */
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" suppressHydrationWarning>
       <body className="min-h-screen bg-[#fcfbf7] antialiased dark:bg-gray-950">
-        <Header />
-        <main>{children}</main>
-        <Footer />
-        <ToastContainer />
+        {children}
       </body>
     </html>
   );

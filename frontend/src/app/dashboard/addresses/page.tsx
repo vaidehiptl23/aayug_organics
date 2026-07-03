@@ -1,44 +1,116 @@
 "use client";
-import { useState } from "react";
-import { MapPin, Plus, Pencil, Trash2, Star } from "lucide-react";
+import { useState, useEffect } from "react";
+import { MapPin, Plus, Trash2, Star } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { Select } from "@/components/ui/Select";
 import { toast } from "@/components/ui/Toast";
 import { Address } from "@/types";
+import { userApi, ApiError } from "@/lib/api";
 
-const INITIAL_ADDRESSES: Address[] = [
-  { id: "a-1", fullName: "Rahul Sharma", phone: "9876543210", addressLine1: "42, Shanti Nagar, Satellite Road", city: "Ahmedabad", state: "Gujarat", postalCode: "380015", country: "India", isDefault: true },
-  { id: "a-2", fullName: "Rahul Sharma", phone: "9876543210", addressLine1: "15, Green Park Colony", addressLine2: "Near Civil Hospital", city: "Surat", state: "Gujarat", postalCode: "395007", country: "India", isDefault: false },
-];
-
-const STATES = ["Gujarat", "Maharashtra", "Delhi", "Karnataka", "Tamil Nadu", "Rajasthan", "Uttar Pradesh", "West Bengal"].map((s) => ({ value: s, label: s }));
+const STATES = [
+  "Andhra Pradesh", "Arunachal Pradesh", "Assam", "Bihar", "Chhattisgarh", 
+  "Goa", "Gujarat", "Haryana", "Himachal Pradesh", "Jharkhand", "Karnataka", 
+  "Kerala", "Madhya Pradesh", "Maharashtra", "Manipur", "Meghalaya", "Mizoram", 
+  "Nagaland", "Odisha", "Punjab", "Rajasthan", "Sikkim", "Tamil Nadu", 
+  "Telangana", "Tripura", "Uttar Pradesh", "Uttarakhand", "West Bengal", "Delhi"
+].map((s) => ({ value: s, label: s }));
 
 export default function AddressesPage() {
-  const [addresses, setAddresses] = useState<Address[]>(INITIAL_ADDRESSES);
+  const [addresses, setAddresses] = useState<Address[]>([]);
   const [showForm, setShowForm] = useState(false);
-  const [form, setForm] = useState({ fullName: "", phone: "", addressLine1: "", addressLine2: "", city: "", state: "", postalCode: "" });
+  const [loading, setLoading] = useState(true);
+  const [form, setForm] = useState({ 
+    fullName: "", 
+    phone: "", 
+    addressLine1: "", 
+    addressLine2: "", 
+    city: "", 
+    state: "", 
+    postalCode: "" 
+  });
 
   const set = (k: keyof typeof form, v: string) => setForm((f) => ({ ...f, [k]: v }));
 
-  const handleAdd = (e: React.FormEvent) => {
+  const loadAddresses = async () => {
+    try {
+      setLoading(true);
+      const res = await userApi.getAddresses();
+      const mapped = (res.data ?? []).map((addr: any) => ({
+        id: addr.id,
+        fullName: addr.fullName,
+        phone: addr.phone,
+        addressLine1: addr.addressLine1,
+        addressLine2: addr.addressLine2 || "",
+        city: addr.city,
+        state: addr.state,
+        postalCode: addr.postalCode,
+        country: addr.country || "India",
+        isDefault: addr.isDefault,
+      }));
+      setAddresses(mapped);
+    } catch {
+      toast.error("Failed to load addresses");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadAddresses();
+  }, []);
+
+  const handleAdd = async (e: React.FormEvent) => {
     e.preventDefault();
-    const newAddr: Address = { ...form, id: `a-${Date.now()}`, country: "India", isDefault: false };
-    setAddresses((a) => [...a, newAddr]);
-    setShowForm(false);
-    setForm({ fullName: "", phone: "", addressLine1: "", addressLine2: "", city: "", state: "", postalCode: "" });
-    toast.success("Address added");
+    try {
+      await userApi.addAddress({
+        fullName: form.fullName,
+        phone: form.phone,
+        addressLine1: form.addressLine1,
+        addressLine2: form.addressLine2 || undefined,
+        city: form.city,
+        state: form.state,
+        postalCode: form.postalCode,
+        country: "India",
+      });
+      toast.success("Address added successfully! 🌿");
+      setShowForm(false);
+      setForm({ fullName: "", phone: "", addressLine1: "", addressLine2: "", city: "", state: "", postalCode: "" });
+      loadAddresses();
+    } catch (err) {
+      const msg = err instanceof ApiError ? err.message : "Failed to add address";
+      toast.error(msg);
+    }
   };
 
-  const setDefault = (id: string) => {
-    setAddresses((a) => a.map((addr) => ({ ...addr, isDefault: addr.id === id })));
-    toast.success("Default address updated");
+  const setDefault = async (id: string) => {
+    try {
+      await userApi.setDefaultAddress(id);
+      toast.success("Default address updated");
+      loadAddresses();
+    } catch {
+      toast.error("Failed to set default address");
+    }
   };
 
-  const remove = (id: string) => {
-    setAddresses((a) => a.filter((addr) => addr.id !== id));
-    toast.info("Address removed");
+  const remove = async (id: string) => {
+    if (!confirm("Are you sure you want to remove this address?")) return;
+    try {
+      await userApi.deleteAddress(id);
+      toast.info("Address removed");
+      loadAddresses();
+    } catch {
+      toast.error("Failed to remove address");
+    }
   };
+
+  if (loading) {
+    return (
+      <div className="flex h-48 items-center justify-center">
+        <p className="text-gray-500 text-sm">Loading addresses...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -51,33 +123,37 @@ export default function AddressesPage() {
         </Button>
       </div>
 
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-        {addresses.map((addr) => (
-          <div key={addr.id} className={`relative rounded-2xl border-2 bg-white p-5 dark:bg-gray-800 ${addr.isDefault ? "border-[#1b4332]" : "border-gray-100 dark:border-gray-700"}`}>
-            {addr.isDefault && (
-              <span className="absolute right-3 top-3 flex items-center gap-1 rounded-full bg-[#1b4332] px-2 py-0.5 text-[10px] font-bold text-white">
-                <Star className="h-2.5 w-2.5 fill-current" /> Default
-              </span>
-            )}
-            <p className="font-bold text-gray-800 dark:text-white">{addr.fullName}</p>
-            <p className="text-sm text-gray-500">{addr.phone}</p>
-            <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">{addr.addressLine1}</p>
-            {addr.addressLine2 && <p className="text-sm text-gray-600 dark:text-gray-400">{addr.addressLine2}</p>}
-            <p className="text-sm text-gray-600 dark:text-gray-400">{addr.city}, {addr.state} – {addr.postalCode}</p>
-            <div className="mt-4 flex gap-2">
-              {!addr.isDefault && (
-                <Button size="sm" variant="outline" onClick={() => setDefault(addr.id)}>Set Default</Button>
+      {addresses.length === 0 ? (
+        <div className="rounded-2xl border border-dashed border-gray-200 p-8 text-center dark:border-gray-700">
+          <p className="text-gray-500 text-sm mb-4">No addresses saved yet.</p>
+          <Button size="sm" onClick={() => setShowForm(true)}>Add Address</Button>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          {addresses.map((addr) => (
+            <div key={addr.id} className={`relative rounded-2xl border-2 bg-white p-5 dark:bg-gray-800 ${addr.isDefault ? "border-[#1b4332]" : "border-gray-100 dark:border-gray-700"}`}>
+              {addr.isDefault && (
+                <span className="absolute right-3 top-3 flex items-center gap-1 rounded-full bg-[#1b4332] px-2 py-0.5 text-[10px] font-bold text-white">
+                  <Star className="h-2.5 w-2.5 fill-current" /> Default
+                </span>
               )}
-              <Button size="sm" variant="ghost" className="gap-1">
-                <Pencil className="h-3.5 w-3.5" /> Edit
-              </Button>
-              <Button size="sm" variant="ghost" onClick={() => remove(addr.id)} className="text-red-500 hover:bg-red-50 gap-1">
-                <Trash2 className="h-3.5 w-3.5" /> Remove
-              </Button>
+              <p className="font-bold text-gray-800 dark:text-white">{addr.fullName}</p>
+              <p className="text-sm text-gray-500">{addr.phone}</p>
+              <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">{addr.addressLine1}</p>
+              {addr.addressLine2 && <p className="text-sm text-gray-600 dark:text-gray-400">{addr.addressLine2}</p>}
+              <p className="text-sm text-gray-600 dark:text-gray-400">{addr.city}, {addr.state} – {addr.postalCode}</p>
+              <div className="mt-4 flex gap-2">
+                {!addr.isDefault && (
+                  <Button size="sm" variant="outline" onClick={() => setDefault(addr.id)}>Set Default</Button>
+                )}
+                <Button size="sm" variant="ghost" onClick={() => remove(addr.id)} className="text-red-500 hover:bg-red-50 gap-1">
+                  <Trash2 className="h-3.5 w-3.5" /> Remove
+                </Button>
+              </div>
             </div>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      )}
 
       {/* Add form */}
       {showForm && (

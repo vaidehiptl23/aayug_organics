@@ -44,9 +44,10 @@ export async function connectRedis(): Promise<void> {
 }
 
 export async function getCache<T>(key: string): Promise<T | null> {
-  const data = await redis.get(key);
-  if (!data) return null;
   try {
+    if (redis.status !== 'ready') return null;
+    const data = await redis.get(key);
+    if (!data) return null;
     return JSON.parse(data) as T;
   } catch {
     return null;
@@ -54,21 +55,36 @@ export async function getCache<T>(key: string): Promise<T | null> {
 }
 
 export async function setCache(key: string, value: unknown, ttl?: number): Promise<void> {
-  const serialized = JSON.stringify(value);
-  if (ttl) {
-    await redis.setex(key, ttl, serialized);
-  } else {
-    await redis.set(key, serialized);
+  try {
+    if (redis.status !== 'ready') return;
+    const serialized = JSON.stringify(value);
+    if (ttl) {
+      await redis.setex(key, ttl, serialized);
+    } else {
+      await redis.set(key, serialized);
+    }
+  } catch {
+    // noop
   }
 }
 
 export async function deleteCache(key: string): Promise<void> {
-  await redis.del(key);
+  try {
+    if (redis.status !== 'ready') return;
+    await redis.del(key);
+  } catch {
+    // noop
+  }
 }
 
 export async function deleteCachePattern(pattern: string): Promise<void> {
-  const keys = await redis.keys(pattern);
-  if (keys.length > 0) {
-    await redis.del(...keys);
+  try {
+    if (redis.status !== 'ready') return;
+    const keys = await redis.keys(pattern);
+    if (keys.length > 0) {
+      await redis.del(...keys);
+    }
+  } catch {
+    // noop
   }
 }

@@ -5,6 +5,7 @@ import { useAuthStore } from "@/store/auth.store";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { toast } from "@/components/ui/Toast";
+import { userApi, ApiError } from "@/lib/api";
 
 export default function ProfilePage() {
   const { user, updateUser } = useAuthStore();
@@ -21,10 +22,20 @@ export default function ProfilePage() {
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    await new Promise((r) => setTimeout(r, 800));
-    updateUser(form);
-    setLoading(false);
-    toast.success("Profile updated successfully");
+    try {
+      await userApi.updateProfile({
+        firstName: form.firstName,
+        lastName: form.lastName,
+        phone: form.phone,
+      });
+      updateUser(form);
+      toast.success("Profile updated successfully! 🌿");
+    } catch (err) {
+      const msg = err instanceof ApiError ? err.message : "Failed to update profile";
+      toast.error(msg);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (

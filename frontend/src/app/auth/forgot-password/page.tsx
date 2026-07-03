@@ -1,6 +1,7 @@
 "use client";
 import { useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { Mail, ArrowLeft, CheckCircle } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
@@ -27,9 +28,15 @@ export default function ForgotPasswordPage() {
     <div className="flex min-h-screen items-center justify-center bg-[#fcfbf7] px-4 dark:bg-gray-950">
       <div className="w-full max-w-md">
         <div className="mb-8 text-center">
-          <Link href="/" className="inline-flex items-center gap-2 text-2xl font-bold">
-            <span>🌿</span>
-            <span className="text-[#1b4332] dark:text-green-400">Aayug Organics</span>
+          <Link href="/" className="inline-flex items-center gap-2">
+            <Image
+              src="/logo.jpg"
+              alt="Aayug Organics Logo"
+              width={180}
+              height={60}
+              className="h-14 w-auto object-contain dark:brightness-110"
+              priority
+            />
           </Link>
         </div>
 

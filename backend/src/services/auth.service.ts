@@ -34,8 +34,11 @@ export class AuthService {
 
     const hashed = await bcrypt.hash(data.password, env.BCRYPT_ROUNDS);
     const user = await this.userRepo.create({
-      ...data,
+      firstName: data.firstName,
+      lastName: data.lastName,
+      email: data.email,
       password: hashed,
+      phone: data.phone,
     });
 
     const token = signEmailToken({ userId: user.id, email: user.email, purpose: 'verify' });
@@ -46,7 +49,8 @@ export class AuthService {
 
   async login(email: string, password: string) {
     const user = await this.userRepo.findByEmail(email);
-    if (!user || !user.isActive) throw new UnauthorizedError('Invalid credentials');
+    if (!user) throw new NotFoundError('Email not registered');
+    if (!user.isActive) throw new UnauthorizedError('Account is inactive');
 
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) throw new UnauthorizedError('Invalid credentials');

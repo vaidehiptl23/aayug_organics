@@ -16,8 +16,8 @@ export default function AdminLoginPage() {
     setError("");
     setLoading(true);
     await new Promise((r) => setTimeout(r, 600));
-    if (adminLogin(email, password)) {
-      setAdminSession(email);
+    const success = await adminLogin(email, password);
+    if (success) {
       router.push("/admin/dashboard");
     } else {
       setError("Invalid admin credentials");

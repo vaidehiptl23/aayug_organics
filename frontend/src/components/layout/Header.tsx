@@ -1,9 +1,10 @@
 "use client";
 import Link from "next/link";
+import Image from "next/image";
 import { useState, useEffect, useRef } from "react";
 import {
   ShoppingCart, Heart, User, Search, Menu, X,
-  ChevronDown, LogOut, Package, Settings, Home,
+  ChevronDown, LogOut, Package, Settings, Home, MapPin,
 } from "lucide-react";
 import { useCartStore } from "@/store/cart.store";
 import { useWishlistStore } from "@/store/wishlist.store";
@@ -97,11 +98,14 @@ export function Header() {
       <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 lg:px-8">
         {/* Logo */}
         <Link href="/" className="flex items-center gap-2 shrink-0">
-          <span className="text-2xl">🌿</span>
-          <div>
-            <span className="text-xl font-bold text-[#1b4332] dark:text-green-400">Aayug</span>
-            <span className="text-xl font-bold text-[#d4a373]"> Organics</span>
-          </div>
+          <Image
+            src="/logo.jpg"
+            alt="Aayug Organics Logo"
+            width={160}
+            height={56}
+            className="h-12 w-auto object-contain dark:brightness-110"
+            priority
+          />
         </Link>
 
         {/* Desktop Nav */}
@@ -187,11 +191,17 @@ export function Header() {
                     <Link href="/dashboard" className="flex items-center gap-2 px-4 py-2 text-sm text-gray-600 hover:bg-gray-50 hover:text-[#1b4332] dark:text-gray-300 dark:hover:bg-gray-700">
                       <Home className="h-4 w-4" /> Dashboard
                     </Link>
-                    <Link href="/dashboard/orders" className="flex items-center gap-2 px-4 py-2 text-sm text-gray-600 hover:bg-gray-50 hover:text-[#1b4332] dark:text-gray-300 dark:hover:bg-gray-700">
-                      <Package className="h-4 w-4" /> Orders
-                    </Link>
                     <Link href="/dashboard/profile" className="flex items-center gap-2 px-4 py-2 text-sm text-gray-600 hover:bg-gray-50 hover:text-[#1b4332] dark:text-gray-300 dark:hover:bg-gray-700">
-                      <Settings className="h-4 w-4" /> Settings
+                      <User className="h-4 w-4" /> Edit Profile
+                    </Link>
+                    <Link href="/dashboard/orders" className="flex items-center gap-2 px-4 py-2 text-sm text-gray-600 hover:bg-gray-50 hover:text-[#1b4332] dark:text-gray-300 dark:hover:bg-gray-700">
+                      <Package className="h-4 w-4" /> My Orders
+                    </Link>
+                    <Link href="/dashboard/wishlist" className="flex items-center gap-2 px-4 py-2 text-sm text-gray-600 hover:bg-gray-50 hover:text-[#1b4332] dark:text-gray-300 dark:hover:bg-gray-700">
+                      <Heart className="h-4 w-4" /> Wishlist
+                    </Link>
+                    <Link href="/dashboard/addresses" className="flex items-center gap-2 px-4 py-2 text-sm text-gray-600 hover:bg-gray-50 hover:text-[#1b4332] dark:text-gray-300 dark:hover:bg-gray-700">
+                      <MapPin className="h-4 w-4" /> Saved Addresses
                     </Link>
                     {user?.email === "admin@aayugorganics.com" && (
                       <Link href="/admin/dashboard" className="flex items-center gap-2 px-4 py-2 text-sm font-semibold text-[#1b4332] hover:bg-green-50 dark:text-green-400">

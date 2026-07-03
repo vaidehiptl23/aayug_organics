@@ -3,7 +3,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect } from "react";
 import {
-  LayoutDashboard, Package, Heart, MapPin, User, Lock, LogOut, ChevronRight,
+  LayoutDashboard, Package, Heart, MapPin, User, Lock, LogOut, ChevronRight, Tag,
 } from "lucide-react";
 import { useAuthStore } from "@/store/auth.store";
 import { cn } from "@/lib/utils";
@@ -13,6 +13,7 @@ const navItems = [
   { href: "/dashboard/orders", label: "My Orders", icon: Package },
   { href: "/dashboard/wishlist", label: "Wishlist", icon: Heart },
   { href: "/dashboard/addresses", label: "Addresses", icon: MapPin },
+  { href: "/dashboard/coupons", label: "My Coupons", icon: Tag },
   { href: "/dashboard/profile", label: "Profile", icon: User },
   { href: "/dashboard/security", label: "Change Password", icon: Lock },
 ];

@@ -1,5 +1,6 @@
 "use client";
 import Link from "next/link";
+import Image from "next/image";
 import { Mail, Phone, MapPin, Facebook, Instagram, Youtube } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 
@@ -61,10 +62,17 @@ export function Footer() {
       <div className="mx-auto grid max-w-7xl grid-cols-1 gap-10 px-4 py-14 sm:grid-cols-2 lg:grid-cols-5 lg:px-8">
         {/* Brand */}
         <div className="lg:col-span-2">
-          <Link href="/" className="flex items-center gap-2">
-            <span className="text-2xl">🌿</span>
-            <span className="text-xl font-bold">Aayug Organics</span>
-          </Link>
+          <div className="bg-white p-2 rounded-xl inline-block mb-3">
+            <Link href="/" className="flex items-center">
+              <Image
+                src="/logo.jpg"
+                alt="Aayug Organics Logo"
+                width={150}
+                height={50}
+                className="h-10 w-auto object-contain"
+              />
+            </Link>
+          </div>
           <p className="mt-3 text-sm leading-relaxed text-white/70">
             Bringing you 100% pure, natural, and organic products — from farms to your family.
             Rooted in Ayurvedic wisdom, tested for modern life.

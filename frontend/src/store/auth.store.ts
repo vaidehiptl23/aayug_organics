@@ -84,9 +84,9 @@ export const useAuthStore = create<AuthState>()(
 // Keep a demo user for UI fallback when backend isn't connected
 export const DEMO_USER: User = {
   id: "demo-1",
-  firstName: "Rahul",
-  lastName: "Sharma",
-  email: "rahul@example.com",
+  firstName: "XYZ",
+  lastName: "Customer",
+  email: "xyz@example.com",
   phone: "9876543210",
   joinedDate: "2024-01-15",
 };

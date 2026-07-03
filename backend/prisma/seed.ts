@@ -25,13 +25,13 @@ async function main() {
   // ── Demo customer ─────────────────────────────────────────
   const customerPassword = await bcrypt.hash('Customer@123', 12);
   const customer = await prisma.user.upsert({
-    where: { email: 'rahul@example.com' },
+    where: { email: 'xyz@example.com' },
     update: {},
     create: {
-      email: 'rahul@example.com',
+      email: 'xyz@example.com',
       password: customerPassword,
-      firstName: 'Rahul',
-      lastName: 'Sharma',
+      firstName: 'XYZ',
+      lastName: 'Customer',
       phone: '9876543210',
       role: 'CUSTOMER',
       isEmailVerified: true,
@@ -184,7 +184,7 @@ async function main() {
 
   console.log('\n🎉 Seed completed!');
   console.log('Admin:    admin@aayugorganics.com / Admin@123');
-  console.log('Customer: rahul@example.com / Customer@123');
+  console.log('Customer: xyz@example.com / Customer@123');
 }
 
 main()

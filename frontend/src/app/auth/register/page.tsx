@@ -1,27 +1,37 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import Image from "next/image";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Eye, EyeOff, Mail, Lock, User, Phone, UserPlus } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { useAuthStore, DEMO_USER } from "@/store/auth.store";
 import { authApi, ApiError } from "@/lib/api";
 import { toast } from "@/components/ui/Toast";
+import { Suspense } from "react";
 
-export default function RegisterPage() {
+function RegisterPageContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const emailParam = searchParams.get("email") ?? "";
   const { loginDirect } = useAuthStore();
   const [showPwd, setShowPwd] = useState(false);
   const [loading, setLoading] = useState(false);
   const [form, setForm] = useState({
-    firstName: "", lastName: "", email: "", phone: "",
+    firstName: "", lastName: "", email: emailParam, phone: "",
     password: "", confirm: "",
   });
   const [errors, setErrors] = useState<Partial<typeof form>>({});
 
   const set = (k: keyof typeof form, v: string) =>
     setForm((f) => ({ ...f, [k]: v }));
+
+  useEffect(() => {
+    if (emailParam) {
+      set("email", emailParam);
+    }
+  }, [emailParam]);
 
   const validate = () => {
     const e: typeof errors = {};
@@ -51,7 +61,7 @@ export default function RegisterPage() {
         confirmPassword: form.confirm,
         phone: form.phone || undefined,
       });
-      toast.success("Account created! Please verify your email 🌿");
+      toast.success("Account created! 🌿");
       // Auto login
       const loginRes = await authApi.login(form.email, form.password);
       loginDirect(
@@ -71,14 +81,8 @@ export default function RegisterPage() {
       if (err instanceof ApiError && err.status === 409) {
         setErrors({ email: "An account with this email already exists" });
       } else {
-        // Demo fallback
-        loginDirect(
-          { ...DEMO_USER, firstName: form.firstName, lastName: form.lastName, email: form.email, phone: form.phone },
-          "demo-access-token",
-          "demo-refresh-token"
-        );
-        toast.success("Account created (demo mode) 🌿");
-        router.push("/dashboard");
+        const msg = err instanceof ApiError ? err.message : "Registration failed";
+        toast.error(msg);
       }
     } finally {
       setLoading(false);
@@ -89,22 +93,27 @@ export default function RegisterPage() {
     <div className="flex min-h-screen items-center justify-center bg-[#fcfbf7] px-4 py-12 dark:bg-gray-950">
       <div className="w-full max-w-md">
         <div className="mb-8 text-center">
-          <Link href="/" className="inline-flex items-center gap-2 text-2xl font-bold">
-            <span>🌿</span>
-            <span className="text-[#1b4332] dark:text-green-400">Aayug</span>
-            <span className="text-[#d4a373]"> Organics</span>
+          <Link href="/" className="inline-flex items-center gap-2">
+            <Image
+              src="/logo.jpg"
+              alt="Aayug Organics Logo"
+              width={180}
+              height={60}
+              className="h-14 w-auto object-contain dark:brightness-110"
+              priority
+            />
           </Link>
-          <h1 className="mt-4 text-2xl font-bold text-gray-900 dark:text-white">Create your account</h1>
+          <h1 className="mt-6 text-2xl font-bold text-gray-900 dark:text-white">Create your account</h1>
           <p className="mt-1 text-sm text-gray-500">Join thousands of organic food lovers.</p>
         </div>
 
         <div className="rounded-2xl border border-gray-100 bg-white p-8 shadow-sm dark:border-gray-700 dark:bg-gray-800">
           <form onSubmit={handleSubmit} className="space-y-4" noValidate>
             <div className="grid grid-cols-2 gap-4">
-              <Input label="First Name *" value={form.firstName} onChange={(e) => set("firstName", e.target.value)} error={errors.firstName} placeholder="Rahul" leftIcon={<User className="h-4 w-4" />} />
-              <Input label="Last Name *" value={form.lastName} onChange={(e) => set("lastName", e.target.value)} error={errors.lastName} placeholder="Sharma" />
+              <Input label="First Name *" value={form.firstName} onChange={(e) => set("firstName", e.target.value)} error={errors.firstName} placeholder="XYZ" leftIcon={<User className="h-4 w-4" />} />
+              <Input label="Last Name *" value={form.lastName} onChange={(e) => set("lastName", e.target.value)} error={errors.lastName} placeholder="Customer" />
             </div>
-            <Input label="Email Address *" type="email" value={form.email} onChange={(e) => set("email", e.target.value)} error={errors.email} placeholder="rahul@example.com" leftIcon={<Mail className="h-4 w-4" />} />
+            <Input label="Email Address *" type="email" value={form.email} onChange={(e) => set("email", e.target.value)} error={errors.email} placeholder="xyz@example.com" leftIcon={<Mail className="h-4 w-4" />} />
             <Input label="Phone Number" type="tel" value={form.phone} onChange={(e) => set("phone", e.target.value)} error={errors.phone} placeholder="9876543210" leftIcon={<Phone className="h-4 w-4" />} hint="Optional — for order updates" />
             <Input
               label="Password *"
@@ -143,5 +152,17 @@ export default function RegisterPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function RegisterPage() {
+  return (
+    <Suspense fallback={
+      <div className="flex min-h-screen items-center justify-center bg-[#fcfbf7] px-4 py-12 dark:bg-gray-950">
+        <p className="text-gray-500 text-sm">Loading signup form...</p>
+      </div>
+    }>
+      <RegisterPageContent />
+    </Suspense>
   );
 }

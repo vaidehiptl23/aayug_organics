@@ -1,6 +1,7 @@
 "use client";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 import { adminLogin, setAdminSession } from "@/lib/auth";
 
 export default function AdminLoginPage() {
@@ -16,8 +17,8 @@ export default function AdminLoginPage() {
     setError("");
     setLoading(true);
     await new Promise((r) => setTimeout(r, 600));
-    if (adminLogin(email, password)) {
-      setAdminSession(email);
+    const success = await adminLogin(email, password);
+    if (success) {
       router.push("/dashboard");
     } else {
       setError("Invalid admin credentials");
@@ -40,13 +41,22 @@ export default function AdminLoginPage() {
         {/* Logo */}
         <div style={{ textAlign: "center", marginBottom: 32 }}>
           <div style={{
-            width: 64, height: 64, borderRadius: 16,
-            background: "rgba(255,255,255,0.12)",
-            display: "flex", alignItems: "center", justifyContent: "center",
-            margin: "0 auto 16px", fontSize: 30,
-          }}>🌿</div>
-          <h1 style={{ color: "white", fontSize: 22, fontWeight: 700, margin: 0 }}>Aayug Organics</h1>
-          <p style={{ color: "rgba(255,255,255,0.5)", fontSize: 13, margin: "6px 0 0" }}>Admin Panel · Restricted Access</p>
+            background: "white",
+            padding: "8px",
+            borderRadius: 12,
+            display: "inline-block",
+            marginBottom: 16
+          }}>
+            <Image
+              src="/logo.jpg"
+              alt="Aayug Organics Logo"
+              width={160}
+              height={50}
+              style={{ objectFit: "contain", display: "block" }}
+              priority
+            />
+          </div>
+          <p style={{ color: "rgba(255,255,255,0.6)", fontSize: 13, margin: "4px 0 0" }}>Admin Panel · Restricted Access</p>
         </div>
 
         {/* Card */}

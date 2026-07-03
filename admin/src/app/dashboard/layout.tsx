@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import {
   LayoutDashboard, Package, ShoppingBag, Users,
   Tag, LogOut, ChevronRight, Menu, X, Bell,
@@ -56,13 +57,16 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         overflowY: "auto",
       }}>
         {/* Logo */}
-        <div style={{ padding: "20px 20px 16px", borderBottom: "1px solid rgba(255,255,255,0.1)" }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-            <span style={{ fontSize: 24 }}>🌿</span>
-            <div>
-              <p style={{ color: "white", fontWeight: 700, fontSize: 14, lineHeight: 1.2 }}>Aayug Organics</p>
-              <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 10, textTransform: "uppercase", letterSpacing: 2 }}>Admin Panel</p>
-            </div>
+        <div style={{ padding: "16px", borderBottom: "1px solid rgba(255,255,255,0.1)" }}>
+          <div style={{ background: "white", padding: "6px", borderRadius: "8px" }}>
+            <Image
+              src="/logo.jpg"
+              alt="Aayug Organics Logo"
+              width={160}
+              height={50}
+              style={{ width: "100%", height: "auto", objectFit: "contain", display: "block" }}
+              priority
+            />
           </div>
         </div>
 

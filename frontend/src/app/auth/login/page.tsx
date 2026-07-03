@@ -1,21 +1,25 @@
 "use client";
 import { useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { Eye, EyeOff, Mail, Lock, LogIn } from "lucide-react";
+import { Eye, EyeOff, Mail, Lock, LogIn, UserPlus, X } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { useAuthStore, DEMO_USER } from "@/store/auth.store";
 import { toast } from "@/components/ui/Toast";
+import { ApiError } from "@/lib/api";
 
 export default function LoginPage() {
   const router = useRouter();
   const { login, loginDirect } = useAuthStore();
-  const [email, setEmail] = useState("rahul@example.com");
+  const [email, setEmail] = useState("xyz@example.com");
   const [password, setPassword] = useState("Customer@123");
   const [showPwd, setShowPwd] = useState(false);
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState<{ email?: string; password?: string }>({});
+
+  const [showRegisterPopup, setShowRegisterPopup] = useState(false);
 
   const validate = () => {
     const e: typeof errors = {};
@@ -30,19 +34,16 @@ export default function LoginPage() {
     if (!validate()) return;
     setLoading(true);
     try {
-      // Try real backend first
       await login(email, password);
       toast.success("Welcome back! 👋");
-      router.push("/dashboard");
-    } catch {
-      // Fallback: demo login when backend/DB not yet configured
-      loginDirect(
-        { ...DEMO_USER, email },
-        "demo-access-token",
-        "demo-refresh-token"
-      );
-      toast.success("Signed in with demo account 👋");
-      router.push("/dashboard");
+      router.push("/");
+    } catch (err) {
+      if (err instanceof ApiError && err.status === 404) {
+        setShowRegisterPopup(true);
+      } else {
+        const msg = err instanceof ApiError ? err.message : "Invalid credentials";
+        toast.error(msg);
+      }
     } finally {
       setLoading(false);
     }
@@ -53,12 +54,17 @@ export default function LoginPage() {
       <div className="w-full max-w-md">
         {/* Logo */}
         <div className="mb-8 text-center">
-          <Link href="/" className="inline-flex items-center gap-2 text-2xl font-bold">
-            <span>🌿</span>
-            <span className="text-[#1b4332] dark:text-green-400">Aayug</span>
-            <span className="text-[#d4a373]"> Organics</span>
+          <Link href="/" className="inline-flex items-center gap-2">
+            <Image
+              src="/logo.jpg"
+              alt="Aayug Organics Logo"
+              width={180}
+              height={60}
+              className="h-14 w-auto object-contain dark:brightness-110"
+              priority
+            />
           </Link>
-          <h1 className="mt-4 text-2xl font-bold text-gray-900 dark:text-white">Sign in to your account</h1>
+          <h1 className="mt-6 text-2xl font-bold text-gray-900 dark:text-white">Sign in to your account</h1>
           <p className="mt-1 text-sm text-gray-500">Welcome back! Please enter your details.</p>
         </div>
 
@@ -92,7 +98,7 @@ export default function LoginPage() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               error={errors.email}
-              placeholder="rahul@example.com"
+              placeholder="xyz@example.com"
               leftIcon={<Mail className="h-4 w-4" />}
               autoComplete="email"
             />
@@ -136,16 +142,54 @@ export default function LoginPage() {
             </Link>
           </p>
 
-          {/* Demo hint */}
-          <div className="mt-4 rounded-lg bg-blue-50 px-4 py-3 dark:bg-blue-900/20">
-            <p className="text-xs text-blue-600 dark:text-blue-400">
-              <strong>Demo credentials:</strong> rahul@example.com / Customer@123
+          <div className="mt-4 rounded-lg bg-green-50 px-4 py-3 dark:bg-green-950/20">
+            <p className="text-xs text-green-700 dark:text-green-400">
+              <strong>Database credentials:</strong> xyz@example.com / Customer@123
               <br />
-              <span className="text-blue-500">(Works without a database — connects to Supabase once configured)</span>
+              <span className="text-green-600">(Real database user — verified against Aiven PostgreSQL)</span>
             </p>
           </div>
         </div>
       </div>
+
+      {showRegisterPopup && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-in fade-in duration-300">
+          <div className="w-full max-w-md scale-in-center transform rounded-2xl bg-white p-6 shadow-2xl dark:bg-gray-900 border border-gray-100 dark:border-gray-800 text-center animate-in zoom-in-95 duration-200">
+            <div className="flex justify-end">
+              <button 
+                onClick={() => setShowRegisterPopup(false)} 
+                className="rounded-lg p-1 text-gray-400 hover:bg-gray-100 hover:text-gray-600 dark:hover:bg-gray-800 dark:hover:text-gray-300"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+            
+            <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-green-50 dark:bg-green-950/30 text-[#1b4332] dark:text-green-400">
+              <UserPlus className="h-7 w-7" />
+            </div>
+
+            <h3 className="text-xl font-bold text-gray-900 dark:text-white">Account Not Found</h3>
+            <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
+              The email <strong className="text-[#1b4332] dark:text-green-400">{email}</strong> is not registered with us yet. Join Aayug Organics to start shopping.
+            </p>
+
+            <div className="mt-6 flex flex-col gap-2">
+              <Link 
+                href={`/auth/register?email=${encodeURIComponent(email)}`}
+                className="flex w-full items-center justify-center gap-2 rounded-xl bg-[#1b4332] py-3 text-sm font-semibold text-white transition hover:bg-[#1b4332]/90 shadow-lg shadow-[#1b4332]/10"
+              >
+                <UserPlus className="h-4 w-4" /> Create Free Account
+              </Link>
+              <button 
+                onClick={() => setShowRegisterPopup(false)} 
+                className="w-full rounded-xl border border-gray-200 py-3 text-sm font-semibold text-gray-500 hover:bg-gray-50 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-800 transition"
+              >
+                Try Another Email
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

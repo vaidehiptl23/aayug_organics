@@ -30,9 +30,9 @@ async function autoSeedIfEmpty(): Promise<void> {
     // Demo customer
     const custPwd = await bcrypt.hash('Customer@123', 12);
     await prisma.user.upsert({
-      where: { email: 'rahul@example.com' },
+      where: { email: 'xyz@example.com' },
       update: {},
-      create: { email: 'rahul@example.com', password: custPwd, firstName: 'Rahul', lastName: 'Sharma', phone: '9876543210', role: 'CUSTOMER', isEmailVerified: true },
+      create: { email: 'xyz@example.com', password: custPwd, firstName: 'XYZ', lastName: 'Customer', phone: '9876543210', role: 'CUSTOMER', isEmailVerified: true },
     });
 
     // Categories

@@ -30,14 +30,13 @@ export function useProducts(params?: Record<string, string>): UseProductsResult 
         const json = await res.json();
         // Map backend product shape to frontend Product type
         const mapped: Product[] = (json.data ?? []).map((p: BackendProduct) => mapProduct(p));
-        setData(mapped.length > 0 ? mapped : staticProducts);
+        setData(mapped);
         setTotal(json.meta?.total ?? mapped.length);
       } catch (err) {
         if ((err as Error).name === "AbortError") return;
-        // Silently fall back to static data
-        setData(staticProducts);
-        setTotal(staticProducts.length);
-        setError(null); // no visible error — static data works fine
+        setData([]);
+        setTotal(0);
+        setError("Failed to load products from database.");
       } finally {
         setLoading(false);
       }

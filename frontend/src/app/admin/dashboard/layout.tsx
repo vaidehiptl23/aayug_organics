@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import { LayoutDashboard, Package, ShoppingBag, Users, Tag, LogOut, ChevronRight, Bell } from "lucide-react";
 import { getAdminSession, clearAdminSession } from "@/lib/admin-auth";
 
@@ -39,13 +40,16 @@ export default function AdminDashboardLayout({ children }: { children: React.Rea
       {/* Sidebar */}
       <aside style={{ width: 220, minWidth: 220, background: "#1b4332", display: "flex", flexDirection: "column", position: "fixed", top: 0, left: 0, bottom: 0, zIndex: 40 }}>
         {/* Logo */}
-        <div style={{ padding: "20px 16px 16px", borderBottom: "1px solid rgba(255,255,255,0.1)" }}>
-          <Link href="/" style={{ display: "flex", alignItems: "center", gap: 10, textDecoration: "none" }}>
-            <span style={{ fontSize: 22 }}>🌿</span>
-            <div>
-              <p style={{ color: "white", fontWeight: 700, fontSize: 13, margin: 0 }}>Aayug Organics</p>
-              <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 10, margin: 0, textTransform: "uppercase", letterSpacing: 1.5 }}>Admin</p>
-            </div>
+        <div style={{ padding: "16px", borderBottom: "1px solid rgba(255,255,255,0.1)" }}>
+          <Link href="/" style={{ display: "block", textDecoration: "none", background: "white", padding: "6px", borderRadius: "8px" }}>
+            <Image
+              src="/logo.jpg"
+              alt="Aayug Organics Logo"
+              width={140}
+              height={40}
+              style={{ width: "100%", height: "auto", objectFit: "contain", display: "block" }}
+              priority
+            />
           </Link>
         </div>
 

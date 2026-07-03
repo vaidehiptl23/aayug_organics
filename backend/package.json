@@ -5,7 +5,7 @@
   "description": "Production-ready backend for Aayug Organics e-commerce platform",
   "main": "dist/server.js",
   "engines": {
-    "node": "20.x",
+    "node": "24.x",
     "npm": ">=10.0.0"
   },
   "scripts": {

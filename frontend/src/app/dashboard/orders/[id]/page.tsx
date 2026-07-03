@@ -15,7 +15,7 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
   useEffect(() => {
     const fetchOrderDetails = async () => {
       try {
-        const res = await ordersApi.getMyOrderDetails(id);
+        const res = await ordersApi.getMyOrder(id);
         setOrder(res.data);
       } catch {
         toast.error("Failed to load order details");

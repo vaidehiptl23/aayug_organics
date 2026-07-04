@@ -1,10 +1,11 @@
 "use client";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { Package, Heart, MapPin, ShoppingBag, TrendingUp, Clock } from "lucide-react";
 import { useAuthStore } from "@/store/auth.store";
 import { useCartStore } from "@/store/cart.store";
 import { useWishlistStore } from "@/store/wishlist.store";
-import { SAMPLE_ORDERS } from "@/data/orders";
+import { ordersApi, userApi } from "@/lib/api";
 import { formatPrice } from "@/lib/utils";
 
 export default function DashboardPage() {
@@ -12,14 +13,44 @@ export default function DashboardPage() {
   const cartCount = useCartStore((s) => s.totalItems());
   const wishlistCount = useWishlistStore((s) => s.items.length);
 
+  const [orders, setOrders] = useState<any[]>([]);
+  const [addressCount, setAddressCount] = useState(0);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const loadDashboardData = async () => {
+      try {
+        const [ordersRes, addressesRes] = await Promise.all([
+          ordersApi.getMyOrders(),
+          userApi.getAddresses().catch(() => ({ data: [] }))
+        ]);
+        setOrders(ordersRes.data ?? []);
+        setAddressCount(addressesRes.data?.length ?? 0);
+      } catch (err) {
+        console.error("Failed to load dashboard statistics:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    loadDashboardData();
+  }, []);
+
   const stats = [
-    { label: "Total Orders", value: SAMPLE_ORDERS.length, icon: Package, href: "/dashboard/orders", color: "bg-blue-50 text-blue-600" },
+    { label: "Total Orders", value: orders.length, icon: Package, href: "/dashboard/orders", color: "bg-blue-50 text-blue-600" },
     { label: "Wishlist Items", value: wishlistCount, icon: Heart, href: "/dashboard/wishlist", color: "bg-red-50 text-red-600" },
     { label: "Cart Items", value: cartCount, icon: ShoppingBag, href: "/cart", color: "bg-amber-50 text-amber-600" },
-    { label: "Saved Addresses", value: 2, icon: MapPin, href: "/dashboard/addresses", color: "bg-green-50 text-green-600" },
+    { label: "Saved Addresses", value: addressCount, icon: MapPin, href: "/dashboard/addresses", color: "bg-green-50 text-green-600" },
   ];
 
-  const recentOrders = SAMPLE_ORDERS.slice(0, 3);
+  const recentOrders = orders.slice(0, 3);
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-[40vh]">
+        <p className="text-sm text-gray-500">Loading dashboard...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-8">
@@ -56,18 +87,26 @@ export default function DashboardPage() {
           <Link href="/dashboard/orders" className="text-sm font-medium text-[#1b4332] hover:underline dark:text-green-400">View all</Link>
         </div>
         <div className="divide-y divide-gray-50 dark:divide-gray-700">
-          {recentOrders.map((order) => (
-            <div key={order.id} className="flex items-center justify-between px-6 py-4">
-              <div>
-                <p className="font-semibold text-sm text-gray-800 dark:text-white">{order.orderNumber}</p>
-                <p className="text-xs text-gray-500">{order.items.length} item{order.items.length > 1 ? "s" : ""} · {new Date(order.date).toLocaleDateString("en-IN")}</p>
-              </div>
-              <div className="text-right">
-                <p className="font-bold text-[#1b4332] dark:text-green-400">{formatPrice(order.total)}</p>
-                <StatusBadge status={order.status} />
-              </div>
+          {recentOrders.length === 0 ? (
+            <div className="px-6 py-8 text-center text-sm text-gray-500">
+              No orders placed yet. <Link href="/products" className="font-bold text-[#1b4332] hover:underline">Start shopping!</Link>
             </div>
-          ))}
+          ) : (
+            recentOrders.map((order) => (
+              <div key={order.id} className="flex items-center justify-between px-6 py-4">
+                <div>
+                  <p className="font-semibold text-sm text-gray-800 dark:text-white">{order.orderNumber}</p>
+                  <p className="text-xs text-gray-500">
+                    {order.items?.length || 0} item{(order.items?.length || 0) !== 1 ? "s" : ""} · {new Date(order.createdAt).toLocaleDateString("en-IN")}
+                  </p>
+                </div>
+                <div className="text-right">
+                  <p className="font-bold text-[#1b4332] dark:text-green-400">{formatPrice(Number(order.grandTotal))}</p>
+                  <StatusBadge status={order.status.toLowerCase()} />
+                </div>
+              </div>
+            ))
+          )}
         </div>
       </div>
 

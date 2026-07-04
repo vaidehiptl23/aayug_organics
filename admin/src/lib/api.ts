@@ -15,6 +15,14 @@ export async function adminFetch<T>(path: string, options: RequestInit = {}): Pr
   }
 
   const res = await fetch(`${BASE_URL}${path}`, { ...options, headers });
+  
+  if (res.status === 401) {
+    if (typeof window !== "undefined") {
+      sessionStorage.removeItem("admin_session");
+      window.location.href = "/auth";
+    }
+  }
+
   if (!res.ok) {
     throw new Error(`API Error: ${res.status}`);
   }

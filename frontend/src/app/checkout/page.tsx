@@ -7,6 +7,7 @@ import {
   CreditCard, ClipboardList, ArrowLeft, ShieldCheck, Zap,
 } from "lucide-react";
 import { useCartStore } from "@/store/cart.store";
+import { ordersApi, userApi, ApiError } from "@/lib/api";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { Select } from "@/components/ui/Select";
@@ -123,86 +124,107 @@ export default function CheckoutPage() {
   const handlePlaceOrder = async () => {
     setPlacing(true);
     try {
+      // 1. Add/Save address to user account first to get a database addressId
+      const addrRes = await userApi.addAddress({
+        fullName: form.fullName,
+        phone: form.phone,
+        addressLine1: form.addressLine1,
+        addressLine2: form.addressLine2 || undefined,
+        city: form.city,
+        state: form.state,
+        postalCode: form.postalCode,
+        country: "India",
+        isDefault: form.saveAddress,
+      });
+      const addressId = (addrRes as any).data.id;
+
       if (form.paymentMethod === "cod") {
-        await handleCOD();
+        // Real COD order placement
+        const checkRes = await ordersApi.checkout({
+          addressId,
+          paymentMethod: "COD",
+          paymentProvider: "COD",
+          notes: "Placed via Storefront COD Checkout",
+        });
+        const orderNum = (checkRes as any).data.order.orderNumber;
+        setOrderNumber(orderNum);
+        clearCart();
+        setOrderPlaced(true);
+        toast.success("Order placed successfully! 🎉");
       } else {
-        await handleRazorpay();
+        // Real Razorpay payment initiation and popup
+        if (!rzpReady || !window.Razorpay) {
+          toast.error("Payment SDK is loading. Please try again in a few seconds.");
+          setPlacing(false);
+          return;
+        }
+
+        const checkRes = await ordersApi.checkout({
+          addressId,
+          paymentMethod: form.paymentMethod.toUpperCase(),
+          paymentProvider: "RAZORPAY",
+          notes: "Placed via Storefront Razorpay Checkout",
+        });
+
+        const orderData = (checkRes as any).data;
+        const rzpKey = process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID || "rzp_test_placeholder";
+
+        const options: RazorpayOptions = {
+          key: rzpKey,
+          amount: orderData.payment.amount,
+          currency: "INR",
+          name: "Aayug Organics",
+          description: `Order ${orderData.order.orderNumber}`,
+          image: "/logo.jpg",
+          order_id: orderData.payment.providerOrderId,
+          handler: async (response) => {
+            try {
+              setPlacing(true);
+              await ordersApi.verifyPayment({
+                orderId: orderData.order.id,
+                providerOrderId: response.razorpay_order_id,
+                providerPaymentId: response.razorpay_payment_id,
+                providerSignature: response.razorpay_signature,
+              });
+              setOrderNumber(orderData.order.orderNumber);
+              clearCart();
+              setOrderPlaced(true);
+              toast.success(`Payment successful! Order ${orderData.order.orderNumber} placed 🎉`);
+            } catch (err) {
+              const msg = err instanceof ApiError ? err.message : "Payment verification failed";
+              toast.error(msg);
+            } finally {
+              setPlacing(false);
+            }
+          },
+          prefill: {
+            name: form.fullName,
+            email: form.email,
+            contact: form.phone,
+          },
+          notes: {
+            address: `${form.addressLine1}, ${form.city}, ${form.state}`,
+          },
+          theme: { color: "#1b4332" },
+          modal: {
+            ondismiss: () => {
+              toast.info("Payment cancelled. Your cart is saved.");
+              setPlacing(false);
+            },
+            confirm_close: true,
+          },
+        };
+
+        const rzp = new window.Razorpay(options);
+        rzp.open();
       }
     } catch (err) {
       console.error(err);
-      toast.error("Something went wrong. Please try again.");
+      const msg = err instanceof ApiError ? err.message : "Order placement failed";
+      toast.error(msg);
+    } finally {
       setPlacing(false);
     }
-  };
-
-  const handleCOD = async () => {
-    await new Promise((r) => setTimeout(r, 800));
-    const num = `AYG-${Date.now().toString(36).toUpperCase()}`;
-    setOrderNumber(num);
-    clearCart();
-    setOrderPlaced(true);
-    toast.success("Order placed! 🎉");
-    setPlacing(false);
-  };
-
-  const handleRazorpay = async () => {
-    if (!rzpReady || !window.Razorpay) {
-      toast.error("Payment is loading, please try again.");
-      setPlacing(false);
-      return;
-    }
-
-    const rzpKey = process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID ?? "";
-
-    if (!rzpKey || rzpKey === "rzp_test_placeholder") {
-      // No key configured — use demo mode
-      toast.info("Razorpay not configured — using demo mode");
-      await new Promise((r) => setTimeout(r, 800));
-      const num = `AYG-${Date.now().toString(36).toUpperCase()}`;
-      setOrderNumber(num);
-      clearCart();
-      setOrderPlaced(true);
-      setPlacing(false);
-      return;
-    }
-
-    // Real Razorpay flow
-    const options: RazorpayOptions = {
-      key: rzpKey,
-      amount: Math.round(grandTotal * 100),
-      currency: "INR",
-      name: "Aayug Organics",
-      description: `Order for ${items.length} item${items.length > 1 ? "s" : ""}`,
-      image: "https://placehold.co/80x80/1b4332/ffffff?text=AO",
-      order_id: `order_${Date.now()}`,
-      handler: (response) => {
-        const num = `AYG-${Date.now().toString(36).toUpperCase()}`;
-        setOrderNumber(num);
-        clearCart();
-        setOrderPlaced(true);
-        toast.success(`Payment successful! Order ${num} placed 🎉`);
-      },
-      prefill: {
-        name: form.fullName,
-        email: form.email,
-        contact: form.phone,
-      },
-      notes: {
-        address: `${form.addressLine1}, ${form.city}, ${form.state}`,
-      },
-      theme: { color: "#1b4332" },
-      modal: {
-        ondismiss: () => {
-          toast.info("Payment cancelled. Your cart is saved.");
-          setPlacing(false);
-        },
-        confirm_close: true,
-      },
-    };
-
-    const rzp = new window.Razorpay(options);
-    rzp.open();
-    setPlacing(false);
   };
 
   // ── Order success screen ───────────────────────────────────

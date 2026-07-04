@@ -168,6 +168,23 @@ export default function AdminProductsPage() {
     }
   };
 
+  const handleImageDelete = async (productId: string, imageId: string) => {
+    if (!confirm("Are you sure you want to delete this image?")) return;
+    try {
+      await adminFetch(`/products/${productId}/images/${imageId}`, {
+        method: "DELETE"
+      });
+      toast("Image deleted successfully", "success");
+      if (showImages) {
+        const updatedImages = (showImages.images ?? []).filter(img => img.id !== imageId);
+        setShowImgs({ ...showImages, images: updatedImages });
+      }
+      loadData();
+    } catch {
+      toast("Failed to delete image", "error");
+    }
+  };
+
   const S = {
     th: { padding: "12px 16px", background: "#f8fafc", fontSize: 11, fontWeight: 700, color: "#94a3b8", textAlign: "left" as const, textTransform: "uppercase" as const, letterSpacing: 0.5, borderBottom: "1px solid #f1f5f9" },
     td: { padding: "12px 16px", fontSize: 13, color: "#374151", borderBottom: "1px solid #f8fafc", verticalAlign: "middle" as const },
@@ -278,6 +295,30 @@ export default function AdminProductsPage() {
                     <div key={img.id} style={{ borderRadius: 12, border: img.isPrimary ? "2px solid #1b4332" : "1px solid #f1f5f9", overflow: "hidden", background: "#fafafa" }}>
                       <div style={{ position: "relative", paddingTop: "75%", background: "#f8fafc" }}>
                         <img src={img.url} alt={img.alt} style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover" }} />
+                        <button
+                          onClick={() => handleImageDelete(showImages.id, img.id)}
+                          style={{
+                            position: "absolute",
+                            top: 8,
+                            right: 8,
+                            width: 24,
+                            height: 24,
+                            borderRadius: "50%",
+                            background: "rgba(220, 38, 38, 0.9)",
+                            color: "white",
+                            border: "none",
+                            cursor: "pointer",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            fontSize: 10,
+                            fontWeight: 700,
+                            boxShadow: "0 2px 4px rgba(0,0,0,0.2)"
+                          }}
+                          title="Delete Image"
+                        >
+                          ✕
+                        </button>
                       </div>
                     </div>
                   ))}

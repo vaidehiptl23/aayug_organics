@@ -2,7 +2,8 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import { User } from "@/types";
-import { authApi, ApiError } from "@/lib/api";
+import { authApi, cartApi, ApiError } from "@/lib/api";
+import { useCartStore } from "./cart.store";
 
 interface AuthState {
   user: User | null;
@@ -38,10 +39,28 @@ export const useAuthStore = create<AuthState>()(
             firstName: apiUser.firstName,
             lastName: apiUser.lastName,
             email: apiUser.email,
-            phone: "",
+            phone: apiUser.phone || "",
             joinedDate: new Date().toISOString(),
           };
           set({ user, accessToken, refreshToken, isAuthenticated: true });
+
+          // Sync cart after successful authentication state set
+          try {
+            const localItems = useCartStore.getState().items;
+            for (const item of localItems) {
+              await cartApi.add(item.product.id, item.quantity).catch(console.error);
+            }
+            const cartRes = await cartApi.get();
+            const dbItems = (cartRes as any).data?.items ?? [];
+            const items = dbItems.map((item: any) => ({
+              product: item.product,
+              quantity: item.quantity,
+            }));
+            useCartStore.setState({ items });
+          } catch (cartErr) {
+            console.error("Cart sync failed on login:", cartErr);
+          }
+
         } catch (err) {
           const msg = err instanceof ApiError ? err.message : "Login failed";
           set({ error: msg });
@@ -49,8 +68,25 @@ export const useAuthStore = create<AuthState>()(
         }
       },
 
-      loginDirect: (user, accessToken, refreshToken) => {
+      loginDirect: async (user, accessToken, refreshToken) => {
         set({ user, accessToken, refreshToken, isAuthenticated: true });
+
+        // Sync cart on direct login/registration
+        try {
+          const localItems = useCartStore.getState().items;
+          for (const item of localItems) {
+            await cartApi.add(item.product.id, item.quantity).catch(console.error);
+          }
+          const cartRes = await cartApi.get();
+          const dbItems = (cartRes as any).data?.items ?? [];
+          const items = dbItems.map((item: any) => ({
+            product: item.product,
+            quantity: item.quantity,
+          }));
+          useCartStore.setState({ items });
+        } catch (cartErr) {
+          console.error("Cart sync failed on direct login:", cartErr);
+        }
       },
 
       logout: async () => {
@@ -59,6 +95,7 @@ export const useAuthStore = create<AuthState>()(
           await authApi.logout(refreshToken).catch(() => {/* ignore */});
         }
         set({ user: null, accessToken: null, refreshToken: null, isAuthenticated: false });
+        useCartStore.setState({ items: [] });
       },
 
       updateUser: (data) =>
@@ -70,7 +107,6 @@ export const useAuthStore = create<AuthState>()(
     }),
     {
       name: "aayug-auth",
-      // Only persist non-sensitive fields needed for UI
       partialize: (state) => ({
         user: state.user,
         accessToken: state.accessToken,
@@ -81,7 +117,6 @@ export const useAuthStore = create<AuthState>()(
   )
 );
 
-// Keep a demo user for UI fallback when backend isn't connected
 export const DEMO_USER: User = {
   id: "demo-1",
   firstName: "XYZ",

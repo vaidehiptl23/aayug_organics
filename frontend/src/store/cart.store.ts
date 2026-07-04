@@ -2,6 +2,8 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import { CartItem, Product } from "@/types";
+import { useAuthStore } from "./auth.store";
+import { cartApi } from "@/lib/api";
 
 interface CartState {
   items: CartItem[];
@@ -44,12 +46,22 @@ export const useCartStore = create<CartState>()(
           }
           return { items: [...state.items, { product, quantity }] };
         });
+
+        // Sync to backend if logged in
+        if (useAuthStore.getState().isAuthenticated) {
+          cartApi.add(product.id, quantity).catch(console.error);
+        }
       },
 
       removeItem: (productId) => {
         set((state) => ({
           items: state.items.filter((i) => i.product.id !== productId),
         }));
+
+        // Sync to backend if logged in
+        if (useAuthStore.getState().isAuthenticated) {
+          cartApi.remove(productId).catch(console.error);
+        }
       },
 
       updateQuantity: (productId, quantity) => {
@@ -62,9 +74,21 @@ export const useCartStore = create<CartState>()(
             i.product.id === productId ? { ...i, quantity } : i
           ),
         }));
+
+        // Sync to backend if logged in
+        if (useAuthStore.getState().isAuthenticated) {
+          cartApi.update(productId, quantity).catch(console.error);
+        }
       },
 
-      clearCart: () => set({ items: [] }),
+      clearCart: () => {
+        set({ items: [] });
+
+        // Sync to backend if logged in
+        if (useAuthStore.getState().isAuthenticated) {
+          cartApi.clear().catch(console.error);
+        }
+      },
 
       totalItems: () =>
         get().items.reduce((sum, i) => sum + i.quantity, 0),

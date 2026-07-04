@@ -5,7 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 import {
   LayoutDashboard, Package, ShoppingBag, Users,
-  Tag, LogOut, ChevronRight, Menu, X, Bell,
+  Tag, LogOut, ChevronRight, Menu, X, Bell, MessageSquare,
 } from "lucide-react";
 import { getAdminSession, clearAdminSession } from "@/lib/auth";
 import { cn } from "@/lib/utils";
@@ -16,6 +16,7 @@ const NAV = [
   { href: "/dashboard/orders",    label: "Orders",    icon: ShoppingBag },
   { href: "/dashboard/customers", label: "Customers", icon: Users },
   { href: "/dashboard/coupons",   label: "Coupons",   icon: Tag },
+  { href: "/dashboard/reviews",   label: "Reviews",   icon: MessageSquare },
 ];
 
 const SIDEBAR_W = 240; // px — single source of truth

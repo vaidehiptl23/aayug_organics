@@ -2,8 +2,9 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import { User } from "@/types";
-import { authApi, cartApi, ApiError } from "@/lib/api";
+import { authApi, cartApi, wishlistApi, ApiError } from "@/lib/api";
 import { useCartStore } from "./cart.store";
+import { useWishlistStore } from "./wishlist.store";
 
 interface AuthState {
   user: User | null;
@@ -44,21 +45,32 @@ export const useAuthStore = create<AuthState>()(
           };
           set({ user, accessToken, refreshToken, isAuthenticated: true });
 
-          // Sync cart after successful authentication state set
+          // Sync cart and wishlist after successful login
           try {
-            const localItems = useCartStore.getState().items;
-            for (const item of localItems) {
+            // Cart sync
+            const localCartItems = useCartStore.getState().items;
+            for (const item of localCartItems) {
               await cartApi.add(item.product.id, item.quantity).catch(console.error);
             }
             const cartRes = await cartApi.get();
-            const dbItems = (cartRes as any).data?.items ?? [];
-            const items = dbItems.map((item: any) => ({
+            const dbCartItems = (cartRes as any).data?.items ?? [];
+            const cartItems = dbCartItems.map((item: any) => ({
               product: item.product,
               quantity: item.quantity,
             }));
-            useCartStore.setState({ items });
-          } catch (cartErr) {
-            console.error("Cart sync failed on login:", cartErr);
+            useCartStore.setState({ items: cartItems });
+
+            // Wishlist sync
+            const localWishlistItems = useWishlistStore.getState().items;
+            for (const item of localWishlistItems) {
+              await wishlistApi.add(item.id).catch(console.error);
+            }
+            const wishlistRes = await wishlistApi.get();
+            const dbWishlistItems = (wishlistRes as any).data ?? [];
+            useWishlistStore.setState({ items: dbWishlistItems });
+
+          } catch (syncErr) {
+            console.error("Cart/Wishlist sync failed on login:", syncErr);
           }
 
         } catch (err) {
@@ -71,21 +83,32 @@ export const useAuthStore = create<AuthState>()(
       loginDirect: async (user, accessToken, refreshToken) => {
         set({ user, accessToken, refreshToken, isAuthenticated: true });
 
-        // Sync cart on direct login/registration
+        // Sync cart and wishlist on direct login/registration
         try {
-          const localItems = useCartStore.getState().items;
-          for (const item of localItems) {
+          // Cart sync
+          const localCartItems = useCartStore.getState().items;
+          for (const item of localCartItems) {
             await cartApi.add(item.product.id, item.quantity).catch(console.error);
           }
           const cartRes = await cartApi.get();
-          const dbItems = (cartRes as any).data?.items ?? [];
-          const items = dbItems.map((item: any) => ({
+          const dbCartItems = (cartRes as any).data?.items ?? [];
+          const cartItems = dbCartItems.map((item: any) => ({
             product: item.product,
             quantity: item.quantity,
           }));
-          useCartStore.setState({ items });
-        } catch (cartErr) {
-          console.error("Cart sync failed on direct login:", cartErr);
+          useCartStore.setState({ items: cartItems });
+
+          // Wishlist sync
+          const localWishlistItems = useWishlistStore.getState().items;
+          for (const item of localWishlistItems) {
+            await wishlistApi.add(item.id).catch(console.error);
+          }
+          const wishlistRes = await wishlistApi.get();
+          const dbWishlistItems = (wishlistRes as any).data ?? [];
+          useWishlistStore.setState({ items: dbWishlistItems });
+
+        } catch (syncErr) {
+          console.error("Cart/Wishlist sync failed on direct login:", syncErr);
         }
       },
 
@@ -96,6 +119,7 @@ export const useAuthStore = create<AuthState>()(
         }
         set({ user: null, accessToken: null, refreshToken: null, isAuthenticated: false });
         useCartStore.setState({ items: [] });
+        useWishlistStore.setState({ items: [] });
       },
 
       updateUser: (data) =>

@@ -109,10 +109,24 @@ export function HeroBanner() {
   const slide = activeSlides[current] || slides[0];
 
   return (
-    <section className={cn("relative overflow-hidden bg-gradient-to-br transition-all duration-700 py-4", slide.bg)} aria-label="Featured products">
+    <section className="relative overflow-hidden bg-slate-950 transition-all duration-700 py-4" aria-label="Featured products">
+      {/* Dynamic blurred image background using the product image's own colors */}
+      <div className="absolute inset-0 pointer-events-none overflow-hidden select-none z-0">
+        {slide.imageUrl ? (
+          <div 
+            className="absolute inset-0 bg-cover bg-center scale-125 blur-3xl opacity-35 transition-all duration-1000"
+            style={{ backgroundImage: `url(${slide.imageUrl})` }}
+          />
+        ) : (
+          <div className={cn("absolute inset-0 bg-gradient-to-br transition-all duration-1000", slide.bg)} />
+        )}
+        {/* Creative gradient overlay mask for legibility and premium glow */}
+        <div className="absolute inset-0 bg-gradient-to-r from-slate-950/80 via-slate-950/50 to-slate-950/30" />
+      </div>
+
       {/* Background Blurry Light Blobs */}
-      <div className="absolute top-12 left-1/4 h-72 w-72 rounded-full bg-white/10 blur-3xl animate-pulse pointer-events-none select-none" />
-      <div className="absolute bottom-12 right-1/4 h-96 w-96 rounded-full bg-[#d4a373]/10 blur-3xl animate-pulse pointer-events-none select-none" style={{ animationDuration: '8s' }} />
+      <div className="absolute top-12 left-1/4 h-72 w-72 rounded-full bg-white/5 blur-3xl animate-pulse pointer-events-none select-none" />
+      <div className="absolute bottom-12 right-1/4 h-96 w-96 rounded-full bg-[#d4a373]/5 blur-3xl animate-pulse pointer-events-none select-none" style={{ animationDuration: '8s' }} />
 
       {/* Floating Organic Particles */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden select-none">

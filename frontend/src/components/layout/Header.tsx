@@ -19,6 +19,16 @@ const navLinks = [
   { href: "/story",   label: "Story"    },
 ];
 
+const announcements = [
+  { icon: "🌿", text: "Free shipping on orders above ₹999" },
+  { icon: "🍯", text: "Use code", badge: "ORGANIC10", suffix: "for 10% off" },
+  { icon: "🥛", text: "100% Pure A2 Gir Cow Ghee — Traditional Bilona Method" },
+  { icon: "🧂", text: "Premium Himalayan Crystal Salt — 84+ Minerals" },
+  { icon: "🌿", text: "Lab-tested. FSSAI Certified. No Preservatives." },
+  { icon: "🚚", text: "Fast delivery across India" },
+  { icon: "🍯", text: "Raw Forest Honey — Unfiltered & Unheated" }
+];
+
 export function Header() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
@@ -65,31 +75,23 @@ export function Header() {
       className={cn(
         "sticky top-0 z-50 w-full transition-all duration-300",
         scrolled
-          ? "bg-white/95 backdrop-blur-md shadow-md dark:bg-gray-900/95"
-          : "bg-white dark:bg-gray-900"
+          ? "bg-white/80 backdrop-blur-md shadow-[0_4px_30px_rgba(0,0,0,0.03)] border-b border-gray-100/50 dark:bg-gray-900/80 dark:border-gray-800/50"
+          : "bg-white dark:bg-gray-900 border-b border-gray-100/30 dark:border-gray-800/30"
       )}
     >
       {/* Scrolling announcement banner */}
-      <div className="bg-[#1b4332] py-1.5 overflow-hidden">
-        <div className="flex animate-marquee whitespace-nowrap">
-          {[
-            "🌿 Free shipping on orders above ₹999",
-            "🍯 Use code ORGANIC10 for 10% off",
-            "🥛 100% Pure A2 Gir Cow Ghee — Traditional Bilona Method",
-            "🧂 Premium Himalayan Crystal Salt — 84+ Minerals",
-            "🌿 Lab-tested. FSSAI Certified. No Preservatives.",
-            "🚚 Fast delivery across India",
-            "🍯 Raw Forest Honey — Unfiltered & Unheated",
-            "🌿 Free shipping on orders above ₹999",
-            "🍯 Use code ORGANIC10 for 10% off",
-            "🥛 100% Pure A2 Gir Cow Ghee — Traditional Bilona Method",
-            "🧂 Premium Himalayan Crystal Salt — 84+ Minerals",
-            "🌿 Lab-tested. FSSAI Certified. No Preservatives.",
-            "🚚 Fast delivery across India",
-            "🍯 Raw Forest Honey — Unfiltered & Unheated",
-          ].map((msg, i) => (
-            <span key={i} className="mx-8 text-xs font-medium text-white">
-              {msg}
+      <div className="bg-gradient-to-r from-emerald-950 via-[#1b4332] to-emerald-950 py-2.5 overflow-hidden border-b border-amber-500/10">
+        <div className="flex animate-marquee whitespace-nowrap hover:[animation-play-state:paused] cursor-pointer">
+          {[...announcements, ...announcements, ...announcements].map((item, i) => (
+            <span key={i} className="mx-8 flex items-center gap-1.5 text-xs font-semibold text-white/95">
+              <span>{item.icon}</span>
+              <span>{item.text}</span>
+              {item.badge && (
+                <span className="inline-block px-1.5 py-0.5 rounded bg-amber-400 text-emerald-950 font-extrabold text-[10px] uppercase shadow-sm tracking-wider">
+                  {item.badge}
+                </span>
+              )}
+              {item.suffix && <span>{item.suffix}</span>}
             </span>
           ))}
         </div>
@@ -109,14 +111,15 @@ export function Header() {
         </Link>
 
         {/* Desktop Nav */}
-        <nav className="hidden items-center gap-6 lg:flex">
+        <nav className="hidden items-center gap-8 lg:flex">
           {navLinks.map((link, i) => (
             <Link
               key={i}
               href={link.href}
-              className="text-sm font-medium text-gray-600 transition-colors hover:text-[#1b4332] dark:text-gray-300 dark:hover:text-green-400"
+              className="group relative py-1 text-sm font-semibold text-gray-600 transition-colors hover:text-[#1b4332] dark:text-gray-300 dark:hover:text-green-400"
             >
               {link.label}
+              <span className="absolute bottom-0 left-0 w-full h-[2px] bg-[#1b4332] dark:bg-green-400 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left" />
             </Link>
           ))}
         </nav>
@@ -126,21 +129,21 @@ export function Header() {
           {/* Search toggle */}
           <button
             onClick={() => setSearchOpen(!searchOpen)}
-            className="relative rounded-lg p-2 text-gray-600 transition-colors hover:bg-gray-100 hover:text-[#1b4332] dark:text-gray-300 dark:hover:bg-gray-800"
+            className="group relative rounded-xl p-2.5 text-gray-600 transition-all hover:bg-gray-100 hover:text-[#1b4332] dark:text-gray-300 dark:hover:bg-gray-800"
             aria-label="Search"
           >
-            <Search className="h-5 w-5" />
+            <Search className="h-5 w-5 transition-transform duration-200 group-hover:scale-110" />
           </button>
 
           {/* Wishlist */}
           <Link
             href="/wishlist"
-            className="relative rounded-lg p-2 text-gray-600 transition-colors hover:bg-gray-100 hover:text-[#1b4332] dark:text-gray-300 dark:hover:bg-gray-800"
+            className="group relative rounded-xl p-2.5 text-gray-600 transition-all hover:bg-gray-100 hover:text-[#1b4332] dark:text-gray-300 dark:hover:bg-gray-800"
             aria-label={`Wishlist (${favCount} items)`}
           >
-            <Heart className="h-5 w-5" />
+            <Heart className="h-5 w-5 transition-transform duration-200 group-hover:scale-110 group-hover:fill-red-500/10 group-hover:text-red-500" />
             {favCount > 0 && (
-              <span className="absolute -right-0.5 -top-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white">
+              <span className="absolute -right-0.5 -top-0.5 flex h-4.5 w-4.5 items-center justify-center rounded-full bg-red-500 text-[10px] font-extrabold text-white shadow-sm ring-2 ring-white animate-pulse">
                 {favCount}
               </span>
             )}
@@ -149,12 +152,12 @@ export function Header() {
           {/* Cart */}
           <Link
             href="/cart"
-            className="relative rounded-lg p-2 text-gray-600 transition-colors hover:bg-gray-100 hover:text-[#1b4332] dark:text-gray-300 dark:hover:bg-gray-800"
+            className="group relative rounded-xl p-2.5 text-gray-600 transition-all hover:bg-gray-100 hover:text-[#1b4332] dark:text-gray-300 dark:hover:bg-gray-800"
             aria-label={`Cart (${cartCount} items)`}
           >
-            <ShoppingCart className="h-5 w-5" />
+            <ShoppingCart className="h-5 w-5 transition-transform duration-200 group-hover:scale-110" />
             {cartCount > 0 && (
-              <span className="absolute -right-0.5 -top-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-[#1b4332] text-[10px] font-bold text-white">
+              <span className="absolute -right-0.5 -top-0.5 flex h-4.5 w-4.5 items-center justify-center rounded-full bg-[#1b4332] text-[10px] font-extrabold text-white shadow-sm ring-2 ring-white dark:bg-green-500 dark:text-emerald-950">
                 {cartCount > 99 ? "99+" : cartCount}
               </span>
             )}
@@ -164,15 +167,19 @@ export function Header() {
           <div className="relative hidden md:block">
             <button
               onClick={() => setUserMenuOpen(!userMenuOpen)}
-              className="flex items-center gap-1.5 rounded-lg p-2 text-gray-600 transition-colors hover:bg-gray-100 hover:text-[#1b4332] dark:text-gray-300 dark:hover:bg-gray-800"
+              className="group flex items-center gap-2 rounded-xl p-2.5 text-gray-600 transition-all hover:bg-gray-100 hover:text-[#1b4332] dark:text-gray-300 dark:hover:bg-gray-800"
               aria-label="Account menu"
               aria-expanded={userMenuOpen}
             >
-              <User className="h-5 w-5" />
+              <div className="relative flex h-8 w-8 items-center justify-center rounded-full bg-emerald-50 text-emerald-800 font-bold text-sm shadow-inner transition-transform group-hover:scale-105 dark:bg-emerald-950/40 dark:text-emerald-300">
+                {authed ? user?.firstName?.[0]?.toUpperCase() : <User className="h-4.5 w-4.5" />}
+              </div>
               {authed && (
-                <span className="text-sm font-medium">{user?.firstName}</span>
+                <span className="text-sm font-semibold text-gray-700 dark:text-gray-300 transition-colors group-hover:text-[#1b4332] dark:group-hover:text-green-400">
+                  {user?.firstName}
+                </span>
               )}
-              <ChevronDown className="h-3 w-3" />
+              <ChevronDown className="h-3 w-3 text-gray-400 transition-transform group-hover:translate-y-0.5" />
             </button>
 
             {userMenuOpen && (

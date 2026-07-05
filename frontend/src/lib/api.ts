@@ -123,7 +123,7 @@ export const authApi = {
   ),
 
   login: (email: string, password: string) =>
-    apiFetch<{ data: { accessToken: string; refreshToken: string; user: { id: string; email: string; firstName: string; lastName: string; role: string } } }>(
+    apiFetch<{ data: { accessToken: string; refreshToken: string; user: { id: string; email: string; firstName: string; lastName: string; role: string; phone?: string } } }>(
       "/auth/login",
       { method: "POST", body: JSON.stringify({ email, password }), skipAuth: true }
     ),

@@ -320,6 +320,25 @@ export default function AdminProductsPage() {
     }
   };
 
+  const handleSetPrimary = async (productId: string, imageId: string) => {
+    try {
+      await adminFetch(`/products/${productId}/images/${imageId}/primary`, {
+        method: "PATCH"
+      });
+      toast("Primary image updated successfully", "success");
+      if (showImages) {
+        const updatedImages = (showImages.images ?? []).map(img => ({
+          ...img,
+          isPrimary: img.id === imageId
+        }));
+        setShowImgs({ ...showImages, images: updatedImages });
+      }
+      loadData();
+    } catch {
+      toast("Failed to update primary image", "error");
+    }
+  };
+
   const S = {
     th: { padding: "12px 16px", background: "#f8fafc", fontSize: 11, fontWeight: 700, color: "#94a3b8", textAlign: "left" as const, textTransform: "uppercase" as const, letterSpacing: 0.5, borderBottom: "1px solid #f1f5f9" },
     td: { padding: "12px 16px", fontSize: 13, color: "#374151", borderBottom: "1px solid #f8fafc", verticalAlign: "middle" as const },
@@ -459,6 +478,30 @@ export default function AdminProductsPage() {
                     <div key={img.id} style={{ borderRadius: 12, border: img.isPrimary ? "2px solid #1b4332" : "1px solid #f1f5f9", overflow: "hidden", background: "#fafafa" }}>
                       <div style={{ position: "relative", paddingTop: "75%", background: "#f8fafc" }}>
                         <img src={img.url} alt={img.alt} style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover" }} />
+                        <button
+                          onClick={() => handleSetPrimary(showImages.id, img.id)}
+                          style={{
+                            position: "absolute",
+                            top: 8,
+                            left: 8,
+                            width: 24,
+                            height: 24,
+                            borderRadius: "50%",
+                            background: img.isPrimary ? "#1b4332" : "rgba(255, 255, 255, 0.9)",
+                            color: img.isPrimary ? "#fbbf24" : "#64748b",
+                            border: "none",
+                            cursor: "pointer",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            fontSize: 12,
+                            boxShadow: "0 2px 4px rgba(0,0,0,0.2)",
+                            transition: "all 0.2s"
+                          }}
+                          title={img.isPrimary ? "Primary Image" : "Set as Primary"}
+                        >
+                          ★
+                        </button>
                         <button
                           onClick={() => handleImageDelete(showImages.id, img.id)}
                           style={{

@@ -39,6 +39,7 @@ router.post(
   productController.uploadProductImages,
 );
 router.delete('/:id/images/:imageId', authenticate, authorize('ADMIN'), productController.deleteProductImage);
+router.patch('/:id/images/:imageId/primary', authenticate, authorize('ADMIN'), productController.setPrimaryProductImage);
 router.post('/:id/inventory', authenticate, authorize('ADMIN'), validate(adjustInventorySchema), productController.adjustInventory);
 router.get('/admin/low-stock', authenticate, authorize('ADMIN'), productController.getLowStockAlerts);
 

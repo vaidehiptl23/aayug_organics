@@ -49,6 +49,11 @@ export const deleteProductImage = async (req: AuthenticatedRequest, res: Respons
   sendSuccess(res, null, 'Image deleted');
 };
 
+export const setPrimaryProductImage = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+  const product = await productService.setPrimaryProductImage(req.params.id, req.params.imageId);
+  sendSuccess(res, product, 'Primary image updated');
+};
+
 export const adjustInventory = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
   const product = await productService.adjustInventory(
     req.params.id,

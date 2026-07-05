@@ -140,6 +140,27 @@ export class ProductService {
     await deleteCache(CACHE_KEYS.PRODUCT(productId));
   }
 
+  async setPrimaryProductImage(productId: string, imageId: string) {
+    const image = await prisma.productImage.findFirst({
+      where: { id: imageId, productId },
+    });
+    if (!image) throw new NotFoundError('Image');
+
+    await prisma.$transaction([
+      prisma.productImage.updateMany({
+        where: { productId },
+        data: { isPrimary: false },
+      }),
+      prisma.productImage.update({
+        where: { id: imageId },
+        data: { isPrimary: true },
+      }),
+    ]);
+
+    await deleteCache(CACHE_KEYS.PRODUCT(productId));
+    return this.productRepo.findById(productId);
+  }
+
   async adjustInventory(productId: string, change: number, reason: string) {
     const product = await this.productRepo.findById(productId);
     if (!product) throw new NotFoundError('Product');

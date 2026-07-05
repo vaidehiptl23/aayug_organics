@@ -48,7 +48,10 @@ export const products: Product[] = [
     category: "Hing", categorySlug: "hing", brand: "Aayug Organics",
     price: 299, originalPrice: 349,
     images: [
-      { id: "hi1", url: "https://placehold.co/600x600/8b6914/ffffff?text=Pure+Hing", alt: "Pure Hing Asafoetida" },
+      { id: "hi1", url: "/products/hing/hing_1.jpg", alt: "Pure Hing Asafoetida Pouch" },
+      { id: "hi2", url: "/products/hing/hing_2.jpg", alt: "Pure Hing Asafoetida Ingredients" },
+      { id: "hi3", url: "/products/hing/hing_3.jpg", alt: "Pure Hing Asafoetida Banner" },
+      { id: "hi4", url: "/products/hing/hing_4.jpg", alt: "Pure Hing Asafoetida Cooking" },
     ],
     badge: "New", rating: 4.7, reviewCount: 189,
     inStock: true, stockCount: 60, weight: "50g", sku: "HNG-PUR-001",

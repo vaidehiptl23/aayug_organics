@@ -109,7 +109,7 @@ export function HeroBanner() {
   const slide = activeSlides[current] || slides[0];
 
   return (
-    <section className="relative overflow-hidden bg-slate-950 transition-all duration-700 py-4" aria-label="Featured products">
+    <section className="relative overflow-hidden bg-slate-950 transition-all duration-700 min-h-[520px] lg:min-h-[580px] flex items-center py-4" aria-label="Featured products">
       {/* Dynamic blurred image background using the product image's own colors */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden select-none z-0">
         {slide.imageUrl ? (
@@ -136,7 +136,7 @@ export function HeroBanner() {
         <span className="absolute bottom-16 left-1/3 text-2xl opacity-15 animate-pulse" style={{ animationDuration: '5s', animationDelay: '2s' }}>🍂</span>
       </div>
 
-      <div className="mx-auto flex max-w-7xl flex-col items-center gap-12 px-4 py-16 lg:flex-row lg:py-24 lg:px-8 relative z-10">
+      <div className="mx-auto flex w-full max-w-7xl flex-col items-center gap-12 px-4 py-8 lg:flex-row lg:py-12 lg:px-8 relative z-10">
         {/* Text */}
         <div className="flex-1 text-white text-center lg:text-left">
           <span className="inline-flex items-center gap-2 rounded-full bg-white/20 px-3.5 py-1.5 text-xs font-semibold backdrop-blur-sm mb-6">

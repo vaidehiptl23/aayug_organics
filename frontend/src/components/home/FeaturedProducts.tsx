@@ -3,6 +3,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { ArrowRight } from "lucide-react";
 import { ProductCard } from "@/components/products/ProductCard";
+import { featuredProducts } from "@/data/products";
 
 interface FeaturedProductsProps {
   title?: string;
@@ -53,7 +54,8 @@ export function FeaturedProducts({
         const featured = mapped.filter((p: any) => featuredSlugs.includes(p.slug));
         setProducts(featured.length > 0 ? featured : mapped.slice(0, 4));
       } catch (err) {
-        console.error("Failed to load featured products", err);
+        console.error("Failed to load featured products, falling back to static products", err);
+        setProducts(featuredProducts);
       } finally {
         setLoading(false);
       }

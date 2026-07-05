@@ -3,6 +3,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { ArrowRight, TrendingUp } from "lucide-react";
 import { ProductCard } from "@/components/products/ProductCard";
+import { bestSellers } from "@/data/products";
 
 export function BestSellers() {
   const [products, setProducts] = useState<any[]>([]);
@@ -42,7 +43,8 @@ export function BestSellers() {
         const bestsellers = mapped.filter((p: any) => p.badge?.toLowerCase().includes("bestseller") || p.isBestSeller || p.slug === "premium-himalayan-crystal-salt" || p.slug === "a2-gir-cow-ghee" || p.slug === "raw-forest-honey");
         setProducts(bestsellers.length > 0 ? bestsellers.slice(0, 4) : mapped.slice(0, 4));
       } catch (err) {
-        console.error("Failed to load best sellers", err);
+        console.error("Failed to load best sellers, falling back to static products", err);
+        setProducts(bestSellers);
       } finally {
         setLoading(false);
       }

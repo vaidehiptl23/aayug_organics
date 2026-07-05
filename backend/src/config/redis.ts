@@ -40,6 +40,10 @@ export const CACHE_TTL = {
 };
 
 export async function connectRedis(): Promise<void> {
+  if (process.env.NODE_ENV === 'production' && env.REDIS_HOST === 'localhost') {
+    logger.warn('⚠️  Redis connection skipped — running in production without external Redis host.');
+    return;
+  }
   await redis.connect();
 }
 

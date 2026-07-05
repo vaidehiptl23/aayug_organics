@@ -109,20 +109,32 @@ export function HeroBanner() {
   const slide = activeSlides[current] || slides[0];
 
   return (
-    <section className={cn("relative overflow-hidden bg-gradient-to-br transition-all duration-700", slide.bg)} aria-label="Featured products">
-      <div className="mx-auto flex max-w-7xl flex-col items-center gap-8 px-4 py-16 lg:flex-row lg:py-24 lg:px-8">
+    <section className={cn("relative overflow-hidden bg-gradient-to-br transition-all duration-700 py-4", slide.bg)} aria-label="Featured products">
+      {/* Background Blurry Light Blobs */}
+      <div className="absolute top-12 left-1/4 h-72 w-72 rounded-full bg-white/10 blur-3xl animate-pulse pointer-events-none select-none" />
+      <div className="absolute bottom-12 right-1/4 h-96 w-96 rounded-full bg-[#d4a373]/10 blur-3xl animate-pulse pointer-events-none select-none" style={{ animationDuration: '8s' }} />
+
+      {/* Floating Organic Particles */}
+      <div className="absolute inset-0 pointer-events-none overflow-hidden select-none">
+        <span className="absolute top-1/4 left-10 text-2xl opacity-20 animate-bounce" style={{ animationDuration: '6s' }}>🍃</span>
+        <span className="absolute bottom-1/3 right-12 text-3xl opacity-20 animate-bounce" style={{ animationDuration: '8s', animationDelay: '1s' }}>🌿</span>
+        <span className="absolute top-12 right-1/4 text-xl opacity-25 animate-pulse" style={{ animationDuration: '4s' }}>✨</span>
+        <span className="absolute bottom-16 left-1/3 text-2xl opacity-15 animate-pulse" style={{ animationDuration: '5s', animationDelay: '2s' }}>🍂</span>
+      </div>
+
+      <div className="mx-auto flex max-w-7xl flex-col items-center gap-12 px-4 py-16 lg:flex-row lg:py-24 lg:px-8 relative z-10">
         {/* Text */}
-        <div className="flex-1 text-white">
-          <span className="inline-flex items-center gap-2 rounded-full bg-white/20 px-3 py-1 text-xs font-semibold backdrop-blur-sm mb-4">
-            <span className="h-1.5 w-1.5 rounded-full bg-[#d4a373]" />
+        <div className="flex-1 text-white text-center lg:text-left">
+          <span className="inline-flex items-center gap-2 rounded-full bg-white/20 px-3.5 py-1.5 text-xs font-semibold backdrop-blur-sm mb-6">
+            <span className="h-1.5 w-1.5 rounded-full bg-[#d4a373] animate-ping" />
             {slide.tag}
           </span>
-          <h1 className="text-4xl font-bold leading-tight md:text-5xl lg:text-6xl">
+          <h1 className="text-4xl font-bold leading-tight md:text-5xl lg:text-6xl tracking-tight">
             {slide.headline}
           </h1>
-          <p className="mt-4 max-w-md text-base text-white/80 leading-relaxed">{slide.sub}</p>
-          <div className="mt-6 flex items-baseline gap-3">
-            <span className="text-4xl font-bold text-[#d4a373]">{slide.price}</span>
+          <p className="mt-4 mx-auto lg:mx-0 max-w-md text-base text-white/80 leading-relaxed">{slide.sub}</p>
+          <div className="mt-6 flex items-baseline justify-center lg:justify-start gap-3">
+            <span className="text-4xl font-extrabold text-[#d4a373] drop-shadow-sm">{slide.price}</span>
             {slide.originalPrice && (
               <span className="text-lg text-white/50 line-through">{slide.originalPrice}</span>
             )}
@@ -130,47 +142,67 @@ export function HeroBanner() {
               {slide.badge}
             </span>
           </div>
-          <div className="mt-8 flex flex-wrap gap-3">
+          <div className="mt-8 flex flex-wrap justify-center lg:justify-start gap-4">
             <Link href={slide.href}>
-              <Button variant="secondary" size="lg" className="gap-2">
+              <Button variant="secondary" size="lg" className="gap-2 shadow-lg hover:shadow-xl transition-all duration-300">
                 {slide.cta} <ArrowRight className="h-4 w-4" />
               </Button>
             </Link>
             <Link href="/products">
-              <Button variant="white" size="lg">View All Products</Button>
+              <Button variant="white" size="lg" className="shadow-md hover:bg-white/10 hover:text-white transition-all duration-300">View All Products</Button>
             </Link>
           </div>
         </div>
-        {/* Visual card or Emoji */}
-        <div className="flex-shrink-0 flex h-64 w-64 items-center justify-center rounded-2xl bg-white p-4 lg:h-80 lg:w-80 shadow-2xl overflow-hidden transition-all duration-500">
-          {slide.imageUrl ? (
-            <img
-              src={slide.imageUrl}
-              alt={slide.headline}
-              className="h-full w-full object-contain transition-all duration-500 hover:scale-105"
-            />
-          ) : (
-            <div className="flex items-center justify-center w-full h-full rounded-full bg-white/10 backdrop-blur-sm">
-              <span className="text-[120px] lg:text-[160px] select-none">{slide.emoji}</span>
-            </div>
-          )}
+
+        {/* Visual card or Emoji container with glowing rings and parallax badges */}
+        <div className="relative group flex-shrink-0 mt-8 lg:mt-0">
+          {/* Outer glowing background blob */}
+          <div className="absolute -inset-4 rounded-[2.5rem] bg-gradient-to-tr from-[#d4a373] via-white/30 to-[#d4a373] opacity-50 blur-2xl transition-all duration-700 group-hover:opacity-80 group-hover:scale-105" />
+          
+          {/* Floating Badge Top-Right */}
+          <div className="absolute -top-4 -right-4 z-10 bg-white text-[#1b4332] text-xs font-extrabold px-3.5 py-2 rounded-full shadow-2xl border border-gray-100 flex items-center gap-1.5 transform hover:scale-110 transition-transform cursor-default select-none animate-bounce" style={{ animationDuration: '4s' }}>
+            <span>🌿</span> 100% Organic
+          </div>
+
+          {/* Floating Badge Bottom-Left */}
+          <div className="absolute -bottom-4 -left-4 z-10 bg-[#d4a373] text-[#1b4332] text-xs font-extrabold px-3.5 py-2 rounded-full shadow-2xl border border-white/20 flex items-center gap-1.5 transform hover:scale-110 transition-transform cursor-default select-none animate-bounce" style={{ animationDuration: '5s', animationDelay: '1s' }}>
+            <span>⭐</span> Premium Grade
+          </div>
+
+          {/* Main Card Wrapper */}
+          <div className="relative flex h-72 w-72 lg:h-80 lg:w-80 items-center justify-center rounded-[2.5rem] bg-white p-6 shadow-2xl overflow-hidden transition-all duration-700 border border-white/60 group-hover:shadow-[0_20px_50px_rgba(0,0,0,0.3)]">
+            {slide.imageUrl ? (
+              <img
+                src={slide.imageUrl}
+                alt={slide.headline}
+                className="h-full w-full object-contain transition-all duration-700 group-hover:scale-110 group-hover:rotate-2"
+              />
+            ) : (
+              <div className="flex items-center justify-center w-full h-full rounded-full bg-[#f4f1ea] dark:bg-gray-700">
+                <span className="text-[100px] lg:text-[120px] select-none transform group-hover:scale-110 transition-transform duration-500">{slide.emoji}</span>
+              </div>
+            )}
+            
+            {/* Subtle overlay reflection */}
+            <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/5 to-white/10 pointer-events-none" />
+          </div>
         </div>
       </div>
 
       {/* Controls */}
-      <div className="absolute inset-y-0 left-4 flex items-center">
-        <button onClick={prev} className="flex h-10 w-10 items-center justify-center rounded-full bg-white/20 text-white hover:bg-white/30 transition-colors" aria-label="Previous">
+      <div className="absolute inset-y-0 left-4 flex items-center z-20">
+        <button onClick={prev} className="flex h-10 w-10 items-center justify-center rounded-full bg-white/20 text-white hover:bg-white/30 transition-colors shadow-md" aria-label="Previous">
           <ChevronLeft className="h-5 w-5" />
         </button>
       </div>
-      <div className="absolute inset-y-0 right-4 flex items-center">
-        <button onClick={next} className="flex h-10 w-10 items-center justify-center rounded-full bg-white/20 text-white hover:bg-white/30 transition-colors" aria-label="Next">
+      <div className="absolute inset-y-0 right-4 flex items-center z-20">
+        <button onClick={next} className="flex h-10 w-10 items-center justify-center rounded-full bg-white/20 text-white hover:bg-white/30 transition-colors shadow-md" aria-label="Next">
           <ChevronRight className="h-5 w-5" />
         </button>
       </div>
 
       {/* Dots */}
-      <div className="absolute bottom-4 left-1/2 flex -translate-x-1/2 gap-2">
+      <div className="absolute bottom-6 left-1/2 flex -translate-x-1/2 gap-2 z-20">
         {activeSlides.map((_, i) => (
           <button
             key={i}

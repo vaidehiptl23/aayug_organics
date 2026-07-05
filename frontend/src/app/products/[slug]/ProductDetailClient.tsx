@@ -151,13 +151,13 @@ export function ProductDetailClient({ product }: Props) {
           {/* Image Gallery */}
           <div className="space-y-4">
             {/* Main image with prev/next arrows */}
-            <div className="relative overflow-hidden rounded-2xl bg-gray-50 dark:bg-gray-800 group">
+            <div className="relative overflow-hidden rounded-2xl bg-white dark:bg-white border border-gray-100 dark:border-gray-800 group">
               <Image
                 src={images[selectedImage]?.url ?? "/placeholder.jpg"}
                 alt={images[selectedImage]?.alt ?? product.name}
                 width={600}
                 height={600}
-                className="h-96 w-full object-contain p-2 bg-white dark:bg-gray-900 lg:h-[500px] transition-all duration-500"
+                className="h-96 w-full object-contain p-2 bg-white dark:bg-white lg:h-[500px] transition-all duration-500"
                 priority
                 unoptimized
               />

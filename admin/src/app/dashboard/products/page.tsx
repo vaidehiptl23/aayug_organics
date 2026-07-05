@@ -18,6 +18,13 @@ type Product = {
   images?: ProductImage[];
 };
 
+const getImageUrl = (url?: string) => {
+  if (!url) return "";
+  if (url.startsWith("http://") || url.startsWith("https://")) return url;
+  if (url.startsWith("/uploads/")) return `http://localhost:5000${url}`;
+  return `http://localhost:3000${url}`;
+};
+
 export default function AdminProductsPage() {
   const [list, setList]           = useState<Product[]>([]);
   const [categories, setCategories] = useState<any[]>([]);
@@ -381,7 +388,7 @@ export default function AdminProductsPage() {
                     {(p.images ?? []).length > 0 ? (
                       <div style={{ width: 40, height: 40, borderRadius: 8, overflow: "hidden", flexShrink: 0, border: "1px solid #f1f5f9" }}>
                         <img
-                          src={(p.images ?? []).find((i) => i.isPrimary)?.url ?? (p.images ?? [])[0]?.url}
+                          src={getImageUrl((p.images ?? []).find((i) => i.isPrimary)?.url ?? (p.images ?? [])[0]?.url)}
                           alt={p.name}
                           style={{ width: "100%", height: "100%", objectFit: "cover" }}
                           onError={(e) => { (e.target as HTMLImageElement).src = `https://placehold.co/40x40/1b4332/fff?text=${p.name[0]}`; }}
@@ -477,7 +484,7 @@ export default function AdminProductsPage() {
                   {(showImages.images ?? []).map((img) => (
                     <div key={img.id} style={{ borderRadius: 12, border: img.isPrimary ? "2px solid #1b4332" : "1px solid #f1f5f9", overflow: "hidden", background: "#fafafa" }}>
                       <div style={{ position: "relative", paddingTop: "75%", background: "#f8fafc" }}>
-                        <img src={img.url} alt={img.alt} style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover" }} />
+                        <img src={getImageUrl(img.url)} alt={img.alt} style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover" }} />
                         <button
                           onClick={() => handleSetPrimary(showImages.id, img.id)}
                           style={{

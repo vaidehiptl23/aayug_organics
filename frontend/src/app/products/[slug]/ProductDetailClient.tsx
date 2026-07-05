@@ -157,7 +157,7 @@ export function ProductDetailClient({ product }: Props) {
                 alt={images[selectedImage]?.alt ?? product.name}
                 width={600}
                 height={600}
-                className="h-96 w-full object-cover lg:h-[500px] transition-all duration-500"
+                className="h-96 w-full object-contain p-2 bg-white dark:bg-gray-900 lg:h-[500px] transition-all duration-500"
                 priority
                 unoptimized
               />
@@ -225,7 +225,7 @@ export function ProductDetailClient({ product }: Props) {
                     )}
                     aria-label={`View image ${i + 1}`}
                   >
-                    <Image src={img.url} alt={img.alt} width={64} height={64} className="h-full w-full object-cover" unoptimized />
+                    <Image src={img.url} alt={img.alt} width={64} height={64} className="h-full w-full object-contain p-1 bg-white" unoptimized />
                   </button>
                 ))}
               </div>

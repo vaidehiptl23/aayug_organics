@@ -30,6 +30,19 @@ export default function AdminProductsPage() {
   const [uploading, setUploading] = useState(false);
   const [loading, setLoading]     = useState(true);
 
+  // Local files preview and crop state
+  const [selectedFiles, setSelectedFiles] = useState<{ file: File; previewUrl: string }[]>([]);
+  const [cropIndex, setCropIndex] = useState<number | null>(null);
+  
+  // Crop margins
+  const [cropLeft, setCropLeft] = useState(0);
+  const [cropRight, setCropRight] = useState(0);
+  const [cropTop, setCropTop] = useState(0);
+  const [cropBottom, setCropBottom] = useState(0);
+  
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const imgRef = useRef<HTMLImageElement | null>(null);
+
   const loadData = async () => {
     try {
       setLoading(true);
@@ -141,15 +154,24 @@ export default function AdminProductsPage() {
     }
   };
 
-  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (!showImages || !e.target.files?.length) return;
+  const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!e.target.files?.length) return;
+    const newFiles = Array.from(e.target.files).map(file => ({
+      file,
+      previewUrl: URL.createObjectURL(file)
+    }));
+    setSelectedFiles(prev => [...prev, ...newFiles]);
+    e.target.value = "";
+  };
+
+  const handleImagesSubmit = async () => {
+    if (!showImages || selectedFiles.length === 0) return;
     setUploading(true);
     try {
       const formData = new FormData();
-      for (let i = 0; i < e.target.files.length; i++) {
-        formData.append("images", e.target.files[i]);
+      for (const f of selectedFiles) {
+        formData.append("images", f.file);
       }
-      // Since it's formData, we call fetch directly
       const sessionStr = sessionStorage.getItem("admin_session");
       const token = sessionStr ? JSON.parse(sessionStr)?.token : null;
       const res = await fetch(`http://localhost:5000/api/v1/products/${showImages.id}/images`, {
@@ -159,6 +181,9 @@ export default function AdminProductsPage() {
       });
       if (!res.ok) throw new Error("Upload failed");
       toast("Images uploaded successfully", "success");
+      
+      selectedFiles.forEach(f => URL.revokeObjectURL(f.previewUrl));
+      setSelectedFiles([]);
       loadData();
       setShowImgs(null);
     } catch {
@@ -166,6 +191,116 @@ export default function AdminProductsPage() {
     } finally {
       setUploading(false);
     }
+  };
+
+  const closeImageModal = () => {
+    selectedFiles.forEach(f => URL.revokeObjectURL(f.previewUrl));
+    setSelectedFiles([]);
+    setShowImgs(null);
+  };
+
+  useEffect(() => {
+    if (cropIndex === null) return;
+    const img = new Image();
+    img.src = selectedFiles[cropIndex].previewUrl;
+    imgRef.current = img;
+    img.onload = () => {
+      setCropLeft(0);
+      setCropRight(0);
+      setCropTop(0);
+      setCropBottom(0);
+      
+      const canvas = canvasRef.current;
+      if (!canvas) return;
+      
+      const maxW = 400;
+      const maxH = 300;
+      let w = img.width;
+      let h = img.height;
+      
+      if (w > maxW) {
+        h = (maxW / w) * h;
+        w = maxW;
+      }
+      if (h > maxH) {
+        w = (maxH / h) * w;
+        h = maxH;
+      }
+      
+      canvas.width = w;
+      canvas.height = h;
+      
+      const ctx = canvas.getContext("2d");
+      if (ctx) {
+        ctx.drawImage(img, 0, 0, w, h);
+      }
+    };
+  }, [cropIndex, selectedFiles]);
+
+  const drawCropOverlay = () => {
+    const canvas = canvasRef.current;
+    const img = imgRef.current;
+    if (!canvas || !img) return;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+    
+    const w = canvas.width;
+    const h = canvas.height;
+    
+    ctx.clearRect(0, 0, w, h);
+    ctx.drawImage(img, 0, 0, w, h);
+    
+    const x = (cropLeft / 100) * w;
+    const y = (cropTop / 100) * h;
+    const cropW = w - x - ((cropRight / 100) * w);
+    const cropH = h - y - ((cropBottom / 100) * h);
+    
+    ctx.fillStyle = "rgba(0, 0, 0, 0.6)";
+    ctx.fillRect(0, 0, w, y);
+    ctx.fillRect(0, y + cropH, w, h - y - cropH);
+    ctx.fillRect(0, y, x, cropH);
+    ctx.fillRect(x + cropW, y, w - x - cropW, cropH);
+    
+    ctx.strokeStyle = "#ea580c";
+    ctx.lineWidth = 2;
+    ctx.strokeRect(x, y, cropW, cropH);
+  };
+
+  useEffect(() => {
+    drawCropOverlay();
+  }, [cropLeft, cropRight, cropTop, cropBottom]);
+
+  const applyCrop = () => {
+    if (cropIndex === null || !imgRef.current) return;
+    const img = imgRef.current;
+    
+    const x = (cropLeft / 100) * img.width;
+    const y = (cropTop / 100) * img.height;
+    const w = img.width - x - ((cropRight / 100) * img.width);
+    const h = img.height - y - ((cropBottom / 100) * img.height);
+    
+    const canvas = document.createElement("canvas");
+    canvas.width = w;
+    canvas.height = h;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+    
+    ctx.drawImage(img, x, y, w, h, 0, 0, w, h);
+    
+    canvas.toBlob((blob) => {
+      if (!blob) return;
+      const originalFile = selectedFiles[cropIndex].file;
+      const croppedFile = new File([blob], originalFile.name, { type: originalFile.type || "image/jpeg" });
+      const previewUrl = URL.createObjectURL(croppedFile);
+      
+      const updated = [...selectedFiles];
+      URL.revokeObjectURL(updated[cropIndex].previewUrl);
+      updated[cropIndex] = { file: croppedFile, previewUrl };
+      
+      setSelectedFiles(updated);
+      setCropIndex(null);
+      toast("Image cropped successfully", "success");
+    }, selectedFiles[cropIndex].file.type || "image/jpeg", 0.95);
   };
 
   const handleImageDelete = async (productId: string, imageId: string) => {
@@ -272,16 +407,45 @@ export default function AdminProductsPage() {
                 <h3 style={{ fontSize: 16, fontWeight: 700, margin: 0, color: "#0f172a" }}>📸 Product Images</h3>
                 <p style={{ fontSize: 12, color: "#94a3b8", margin: "3px 0 0" }}>{showImages.name} · {(showImages.images ?? []).length} images</p>
               </div>
-              <button onClick={() => setShowImgs(null)} style={{ background: "#f8fafc", border: "1px solid #e2e8f0", borderRadius: 8, padding: "6px 12px", cursor: "pointer", fontSize: 13 }}>Close ✕</button>
+              <button onClick={closeImageModal} style={{ background: "#f8fafc", border: "1px solid #e2e8f0", borderRadius: 8, padding: "6px 12px", cursor: "pointer", fontSize: 13 }}>Close ✕</button>
             </div>
 
             <div style={{ padding: "16px 24px", borderBottom: "1px solid #f8fafc" }}>
-              <input ref={fileRef} type="file" accept="image/*" multiple onChange={handleImageUpload} style={{ display: "none" }} />
+              <input ref={fileRef} type="file" accept="image/*" multiple onChange={handleImageSelect} style={{ display: "none" }} />
               <button onClick={() => fileRef.current?.click()} disabled={uploading}
                 style={{ width: "100%", padding: "14px", border: "2px dashed #d4a373", borderRadius: 12, background: "#fffbf5", color: "#92400e", fontSize: 13, fontWeight: 600, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 8 }}>
-                {uploading ? "⏳ Uploading..." : "📁 Click to upload images (multiple allowed)"}
+                📁 Select images to upload (multiple allowed)
               </button>
             </div>
+
+            {/* Pending uploads preview with Crop Option */}
+            {selectedFiles.length > 0 && (
+              <div style={{ padding: "16px 24px", borderBottom: "1px solid #f1f5f9", background: "#fdfbf7" }}>
+                <h4 style={{ fontSize: 13, fontWeight: 700, marginBottom: 12, color: "#92400e" }}>Pending Uploads ({selectedFiles.length})</h4>
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 10 }}>
+                  {selectedFiles.map((f, idx) => (
+                    <div key={idx} style={{ position: "relative", borderRadius: 8, overflow: "hidden", border: "1px solid #e2e8f0", background: "white", padding: 6 }}>
+                      <img src={f.previewUrl} alt="Preview" style={{ width: "100%", height: 60, objectFit: "cover", borderRadius: 6 }} />
+                      <div style={{ display: "flex", gap: 4, marginTop: 6 }}>
+                        <button onClick={() => setCropIndex(idx)} style={{ flex: 1, padding: "4px 0", background: "#d4a373", color: "white", border: "none", borderRadius: 4, fontSize: 10, fontWeight: 600, cursor: "pointer" }}>Crop ✂️</button>
+                        <button onClick={() => {
+                          const updated = [...selectedFiles];
+                          URL.revokeObjectURL(updated[idx].previewUrl);
+                          updated.splice(idx, 1);
+                          setSelectedFiles(updated);
+                        }} style={{ padding: "4px 8px", background: "#fee2e2", color: "#dc2626", border: "none", borderRadius: 4, fontSize: 10, cursor: "pointer" }}>✕</button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                <div style={{ marginTop: 14, display: "flex", gap: 10 }}>
+                  <button onClick={handleImagesSubmit} disabled={uploading}
+                    style={{ flex: 1, padding: "10px 14px", background: "#1b4332", color: "white", border: "none", borderRadius: 8, fontSize: 12, fontWeight: 600, cursor: "pointer" }}>
+                    {uploading ? "⏳ Uploading..." : "💾 Save & Upload All Selected"}
+                  </button>
+                </div>
+              </div>
+            )}
 
             <div style={{ flex: 1, overflowY: "auto", padding: 24 }}>
               {(showImages.images ?? []).length === 0 ? (
@@ -368,6 +532,51 @@ export default function AdminProductsPage() {
                 <button onClick={() => setModal(false)} style={{ background: "#f1f5f9", color: "#64748b", border: "none", padding: "10px 18px", borderRadius: 10, cursor: "pointer", fontSize: 13, fontWeight: 600 }}>Cancel</button>
                 <button onClick={handleSave} style={{ background: "#1b4332", color: "white", border: "none", padding: "10px 18px", borderRadius: 10, cursor: "pointer", fontSize: 13, fontWeight: 600 }}>Save Product</button>
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+      {/* ── Image Cropper Modal ─────────────────────────────── */}
+      {cropIndex !== null && (
+        <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.85)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 120, padding: 20 }}>
+          <div style={{ background: "white", borderRadius: 20, width: "100%", maxWidth: 500, padding: 24, boxShadow: "0 25px 60px rgba(0,0,0,0.5)" }}>
+            <h3 style={{ fontSize: 16, fontWeight: 700, margin: "0 0 16px", color: "#0f172a" }}>✂️ Crop Product Image</h3>
+            
+            <div style={{ display: "flex", justifyContent: "center", background: "#fafafa", borderRadius: 12, padding: 14, overflow: "hidden", maxHeight: 300 }}>
+              <canvas ref={canvasRef} style={{ maxWidth: "100%", height: "auto", objectFit: "contain", borderRadius: 8, boxShadow: "0 4px 10px rgba(0,0,0,0.15)" }} />
+            </div>
+            
+            {/* Crop Sliders */}
+            <div style={{ marginTop: 18, display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
+              <div>
+                <label style={{ display: "flex", justifyContent: "space-between", fontSize: 11, fontWeight: 600, color: "#64748b", marginBottom: 4 }}>
+                  <span>Crop Left</span> <span>{cropLeft}%</span>
+                </label>
+                <input type="range" min="0" max={100 - cropRight - 1} value={cropLeft} onChange={(e) => setCropLeft(Number(e.target.value))} style={{ width: "100%" }} />
+              </div>
+              <div>
+                <label style={{ display: "flex", justifyContent: "space-between", fontSize: 11, fontWeight: 600, color: "#64748b", marginBottom: 4 }}>
+                  <span>Crop Right</span> <span>{cropRight}%</span>
+                </label>
+                <input type="range" min="0" max={100 - cropLeft - 1} value={cropRight} onChange={(e) => setCropRight(Number(e.target.value))} style={{ width: "100%" }} />
+              </div>
+              <div>
+                <label style={{ display: "flex", justifyContent: "space-between", fontSize: 11, fontWeight: 600, color: "#64748b", marginBottom: 4 }}>
+                  <span>Crop Top</span> <span>{cropTop}%</span>
+                </label>
+                <input type="range" min="0" max={100 - cropBottom - 1} value={cropTop} onChange={(e) => setCropTop(Number(e.target.value))} style={{ width: "100%" }} />
+              </div>
+              <div>
+                <label style={{ display: "flex", justifyContent: "space-between", fontSize: 11, fontWeight: 600, color: "#64748b", marginBottom: 4 }}>
+                  <span>Crop Bottom</span> <span>{cropBottom}%</span>
+                </label>
+                <input type="range" min="0" max={100 - cropTop - 1} value={cropBottom} onChange={(e) => setCropBottom(Number(e.target.value))} style={{ width: "100%" }} />
+              </div>
+            </div>
+            
+            <div style={{ display: "flex", gap: 10, justifyContent: "flex-end", marginTop: 20 }}>
+              <button onClick={() => setCropIndex(null)} style={{ background: "#f1f5f9", color: "#64748b", border: "none", padding: "8px 16px", borderRadius: 8, cursor: "pointer", fontSize: 12, fontWeight: 600 }}>Cancel</button>
+              <button onClick={applyCrop} style={{ background: "#ea580c", color: "white", border: "none", padding: "8px 16px", borderRadius: 8, cursor: "pointer", fontSize: 12, fontWeight: 600 }}>Apply Crop ✂️</button>
             </div>
           </div>
         </div>

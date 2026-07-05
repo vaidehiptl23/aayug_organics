@@ -63,17 +63,50 @@ const slides = [
 export function HeroBanner() {
   const [current, setCurrent] = useState(0);
   const [auto, setAuto] = useState(true);
+  const [dynamicSlides, setDynamicSlides] = useState<any[]>([]);
 
-  const prev = () => { setAuto(false); setCurrent((c) => (c - 1 + slides.length) % slides.length); };
-  const next = () => { setAuto(false); setCurrent((c) => (c + 1) % slides.length); };
+  const activeSlides = dynamicSlides.length > 0 ? dynamicSlides : slides;
+
+  const prev = () => { setAuto(false); setCurrent((c) => (c - 1 + activeSlides.length) % activeSlides.length); };
+  const next = () => { setAuto(false); setCurrent((c) => (c + 1) % activeSlides.length); };
+
+  useEffect(() => {
+    const fetchFeatured = async () => {
+      try {
+        const res = await fetch("http://localhost:5000/api/v1/products");
+        if (!res.ok) throw new Error("Failed to fetch");
+        const json = await res.json();
+        const apiProducts = json.data ?? [];
+        
+        const updated = slides.map(slide => {
+          const slug = slide.href.split("/").pop();
+          const match = apiProducts.find((p: any) => p.slug === slug);
+          if (match) {
+            const primaryImg = match.images?.find((img: any) => img.isPrimary)?.url || match.images?.[0]?.url;
+            return {
+              ...slide,
+              price: `₹${match.price}`,
+              imageUrl: primaryImg || null
+            };
+          }
+          return slide;
+        });
+        setDynamicSlides(updated);
+      } catch (err) {
+        console.error("Error loading dynamic slides", err);
+        setDynamicSlides(slides);
+      }
+    };
+    fetchFeatured();
+  }, []);
 
   useEffect(() => {
     if (!auto) return;
-    const t = setInterval(() => setCurrent((c) => (c + 1) % slides.length), 5000);
+    const t = setInterval(() => setCurrent((c) => (c + 1) % activeSlides.length), 5000);
     return () => clearInterval(t);
-  }, [auto]);
+  }, [auto, activeSlides.length]);
 
-  const slide = slides[current];
+  const slide = activeSlides[current] || slides[0];
 
   return (
     <section className={cn("relative overflow-hidden bg-gradient-to-br transition-all duration-700", slide.bg)} aria-label="Featured products">
@@ -108,9 +141,19 @@ export function HeroBanner() {
             </Link>
           </div>
         </div>
-        {/* Emoji visual */}
-        <div className="flex-shrink-0 flex h-64 w-64 items-center justify-center rounded-full bg-white/10 backdrop-blur-sm lg:h-80 lg:w-80">
-          <span className="text-[120px] lg:text-[160px] select-none">{slide.emoji}</span>
+        {/* Visual card or Emoji */}
+        <div className="flex-shrink-0 flex h-64 w-64 items-center justify-center rounded-2xl bg-white p-4 lg:h-80 lg:w-80 shadow-2xl overflow-hidden transition-all duration-500">
+          {slide.imageUrl ? (
+            <img
+              src={slide.imageUrl}
+              alt={slide.headline}
+              className="h-full w-full object-contain transition-all duration-500 hover:scale-105"
+            />
+          ) : (
+            <div className="flex items-center justify-center w-full h-full rounded-full bg-white/10 backdrop-blur-sm">
+              <span className="text-[120px] lg:text-[160px] select-none">{slide.emoji}</span>
+            </div>
+          )}
         </div>
       </div>
 
@@ -128,7 +171,7 @@ export function HeroBanner() {
 
       {/* Dots */}
       <div className="absolute bottom-4 left-1/2 flex -translate-x-1/2 gap-2">
-        {slides.map((_, i) => (
+        {activeSlides.map((_, i) => (
           <button
             key={i}
             onClick={() => { setCurrent(i); setAuto(false); }}

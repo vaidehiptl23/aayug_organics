@@ -5,7 +5,7 @@ import { getPaginationParams } from '../utils/helpers';
 
 const productInclude = {
   category: { select: { id: true, name: true, slug: true } },
-  images: { orderBy: { sortOrder: 'asc' as const } },
+  images: { orderBy: [{ isPrimary: 'desc' as const }, { sortOrder: 'asc' as const }] },
 };
 
 export class ProductRepository {

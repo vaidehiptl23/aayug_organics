@@ -161,6 +161,22 @@ export default function AdminProductsPage() {
     }
   };
 
+  const handleToggleStock = async (product: Product) => {
+    try {
+      const newStock = product.stock > 0 ? 0 : 50;
+      await adminFetch(`/products/${product.id}`, {
+        method: "PATCH",
+        body: JSON.stringify({
+          stockQuantity: newStock
+        })
+      });
+      toast(`Product set to ${newStock > 0 ? "In Stock" : "Out of Stock"}`, "success");
+      loadData();
+    } catch (err) {
+      toast("Failed to update stock status", "error");
+    }
+  };
+
   const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files?.length) return;
     const newFiles = Array.from(e.target.files).map(file => ({
@@ -411,7 +427,51 @@ export default function AdminProductsPage() {
                     🖼 {(p.images ?? []).length} photos
                   </button>
                 </td>
-                <td style={S.td}><span style={{ fontSize: 11, fontWeight: 600, padding: "2px 9px", borderRadius: 20, background: p.stock > 0 ? "#dcfce7" : "#fee2e2", color: p.stock > 0 ? "#16a34a" : "#dc2626" }}>{p.stock > 0 ? "active" : "out of stock"}</span></td>
+                <td style={S.td}>
+                  <button 
+                    onClick={() => handleToggleStock(p)}
+                    style={{
+                      background: "none",
+                      border: "none",
+                      padding: 0,
+                      cursor: "pointer",
+                      display: "inline-flex",
+                      alignItems: "center",
+                      gap: 8,
+                      outline: "none"
+                    }}
+                    title="Click to toggle stock status"
+                  >
+                    <div style={{
+                      width: 36,
+                      height: 18,
+                      borderRadius: 9,
+                      background: p.stock > 0 ? "#10b981" : "#cbd5e1",
+                      position: "relative",
+                      transition: "background-color 0.2s",
+                    }}>
+                      <div style={{
+                        width: 12,
+                        height: 12,
+                        borderRadius: "50%",
+                        background: "white",
+                        position: "absolute",
+                        top: 3,
+                        left: p.stock > 0 ? 21 : 3,
+                        transition: "left 0.2s",
+                        boxShadow: "0 1px 2px rgba(0,0,0,0.15)"
+                      }} />
+                    </div>
+                    <span style={{ 
+                      fontSize: 12, 
+                      fontWeight: 600, 
+                      color: p.stock > 0 ? "#059669" : "#64748b",
+                      textTransform: "capitalize"
+                    }}>
+                      {p.stock > 0 ? "In Stock" : "Out of Stock"}
+                    </span>
+                  </button>
+                </td>
                 <td style={S.td}>
                   <div style={{ display: "flex", gap: 6 }}>
                     <button onClick={() => openEdit(p)} style={S.btn("#f0fdf4", "#16a34a")}>Edit</button>

@@ -3,7 +3,7 @@ import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { Eye, EyeOff, Mail, Lock, LogIn, UserPlus, X } from "lucide-react";
+import { Eye, EyeOff, Mail, Lock, LogIn, UserPlus, X, Smartphone } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { useAuthStore } from "@/store/auth.store";
@@ -115,6 +115,15 @@ export default function LoginPage() {
             <Button type="submit" fullWidth size="lg" loading={loading} className="gap-2 mt-6">
               <LogIn className="h-4 w-4" /> Sign In
             </Button>
+
+            <div className="relative my-4 flex items-center justify-center text-xs uppercase font-semibold text-gray-400">
+              <span className="absolute inset-x-0 h-px bg-gray-100 dark:bg-gray-800"></span>
+              <span className="relative bg-white dark:bg-gray-900 px-3">or</span>
+            </div>
+
+            <Link href="/auth/otp" className="flex w-full items-center justify-center gap-2 rounded-xl border border-gray-200 py-3 text-sm font-semibold text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:text-gray-200 dark:hover:bg-gray-800 transition">
+              <Smartphone className="h-4 w-4 text-[#1b4332] dark:text-green-400" /> Sign In with Phone OTP
+            </Link>
           </form>
 
           <p className="mt-6 text-center text-sm text-gray-500 dark:text-gray-400">

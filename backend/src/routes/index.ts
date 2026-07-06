@@ -1,5 +1,6 @@
 import { Router, Request, Response } from 'express';
 import authRoutes from './auth.routes';
+import otpRoutes from './otp.routes';
 import userRoutes from './user.routes';
 import productRoutes from './product.routes';
 import categoryRoutes from './category.routes';
@@ -24,6 +25,7 @@ router.get('/health', (_req: Request, res: Response) => {
 });
 
 router.use('/auth', authRoutes);
+router.use('/auth', otpRoutes);
 router.use('/users', userRoutes);
 router.use('/products', productRoutes);
 router.use('/categories', categoryRoutes);

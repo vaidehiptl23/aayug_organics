@@ -524,3 +524,16 @@ model Notification {
   @@index([isRead])
   @@map("notifications")
 }
+
+// ─────────────────────────────────────────────
+// OTP
+// ─────────────────────────────────────────────
+model Otp {
+  id        String   @id @default(uuid())
+  phone     String   @unique
+  code      String
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@map("otps")
+}

@@ -59,6 +59,10 @@ const envSchema = z.object({
   SHIPPING_CHARGE: z.string().default('99'),
   TAX_RATE: z.string().default('0.18'),
   BCRYPT_ROUNDS: z.string().default('12'),
+  FAST2SMS_API_KEY: z.string().default(''),
+  TWILIO_ACCOUNT_SID: z.string().default(''),
+  TWILIO_AUTH_TOKEN: z.string().default(''),
+  TWILIO_FROM_NUMBER: z.string().default(''),
 });
 
 const parsed = envSchema.safeParse(process.env);

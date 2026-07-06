@@ -1,0 +1,150 @@
+import bcrypt from 'bcryptjs';
+import { prisma } from '../config/database';
+import { smsService } from './sms.service';
+import { signAccessToken, signRefreshToken } from '../utils/jwt';
+import { BadRequestError, NotFoundError, ConflictError } from '../utils/appError';
+import { omitFields } from '../utils/helpers';
+
+export class OtpService {
+  /**
+   * Generates a 6-digit OTP code, saves it to the database, and sends it via SMS.
+   */
+  async generateOtp(phone: string): Promise<void> {
+    const code = Math.floor(100000 + Math.random() * 900000).toString(); // 6-digit code
+    const expiresAt = new Date(Date.now() + 5 * 60 * 1000); // 5 minutes expiry
+
+    // Save or update the OTP in the database
+    await prisma.otp.upsert({
+      where: { phone },
+      create: { phone, code, expiresAt },
+      update: { code, expiresAt, createdAt: new Date() }
+    });
+
+    // Send SMS
+    await smsService.sendOtp(phone, code);
+  }
+
+  /**
+   * Verifies the OTP code. 
+   * If correct, checks if user exists.
+   * If user exists, signs tokens and logs them in.
+   * If user is new, returns a verification status to prompt profile setup.
+   */
+  async verifyOtp(phone: string, code: string) {
+    const record = await prisma.otp.findUnique({
+      where: { phone }
+    });
+
+    if (!record) {
+      throw new NotFoundError('No verification code was sent to this number');
+    }
+
+    if (record.expiresAt < new Date()) {
+      await prisma.otp.delete({ where: { phone } }).catch(() => {});
+      throw new BadRequestError('Verification code has expired. Please request a new one.');
+    }
+
+    if (record.code !== code) {
+      throw new BadRequestError('Invalid verification code');
+    }
+
+    // Delete the verified OTP
+    await prisma.otp.delete({ where: { phone } }).catch(() => {});
+
+    // Check if user already exists with this phone number
+    let user = await prisma.user.findFirst({
+      where: { phone }
+    });
+
+    if (user) {
+      // Sign tokens and log them in
+      const payload = { userId: user.id, email: user.email, role: user.role };
+      const accessToken = signAccessToken(payload);
+      const refreshToken = signRefreshToken(payload);
+
+      await prisma.refreshToken.create({
+        data: {
+          token: refreshToken,
+          userId: user.id,
+          expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
+        }
+      });
+
+      return {
+        isNewUser: false,
+        accessToken,
+        refreshToken,
+        user: omitFields(user, ['password', 'emailVerifyToken', 'emailVerifyExpiry'])
+      };
+    }
+
+    // Return new user status to initiate name and email registration on frontend
+    return {
+      isNewUser: true,
+      phone
+    };
+  }
+
+  /**
+   * Completes registration for new OTP users by gathering email, firstName, and lastName.
+   */
+  async completeOtpProfile(data: {
+    phone: string;
+    firstName: string;
+    lastName: string;
+    email: string;
+  }) {
+    // 1. Check if email already belongs to an account
+    let user = await prisma.user.findUnique({
+      where: { email: data.email }
+    });
+
+    if (user) {
+      // If user exists by email but doesn't have a phone, link it!
+      if (!user.phone) {
+        user = await prisma.user.update({
+          where: { id: user.id },
+          data: { phone: data.phone }
+        });
+      } else {
+        throw new ConflictError('An account with this email already exists with a different phone number');
+      }
+    } else {
+      // 2. Create new user with a random dummy password (since they login via OTP)
+      const randomPassword = Math.random().toString(36).substring(2) + Date.now().toString(36);
+      const hashedPassword = await bcrypt.hash(randomPassword, 12);
+
+      user = await prisma.user.create({
+        data: {
+          firstName: data.firstName,
+          lastName: data.lastName,
+          email: data.email,
+          phone: data.phone,
+          password: hashedPassword,
+          isEmailVerified: true // Auto-verify email via OTP path
+        }
+      });
+    }
+
+    // 3. Generate tokens
+    const payload = { userId: user.id, email: user.email, role: user.role };
+    const accessToken = signAccessToken(payload);
+    const refreshToken = signRefreshToken(payload);
+
+    await prisma.refreshToken.create({
+      data: {
+        token: refreshToken,
+        userId: user.id,
+        expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
+      }
+    });
+
+    return {
+      accessToken,
+      refreshToken,
+      user: omitFields(user, ['password', 'emailVerifyToken', 'emailVerifyExpiry'])
+    };
+  }
+}
+
+export const otpService = new OtpService();

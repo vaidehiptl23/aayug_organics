@@ -114,6 +114,27 @@ export class ApiError extends Error {
 // ─── Auth API ────────────────────────────────────────────────────────────────
 
 export const authApi = {
+  sendOtp: (phone: string) =>
+    apiFetch<{ success: boolean; message: string }>("/auth/otp/send", {
+      method: "POST",
+      body: JSON.stringify({ phone }),
+      skipAuth: true
+    }),
+
+  verifyOtp: (phone: string, code: string) =>
+    apiFetch<{ data: { isNewUser: boolean; accessToken?: string; refreshToken?: string; user?: any; phone?: string } }>("/auth/otp/verify", {
+      method: "POST",
+      body: JSON.stringify({ phone, code }),
+      skipAuth: true
+    }),
+
+  completeOtpProfile: (data: { phone: string; firstName: string; lastName: string; email: string }) =>
+    apiFetch<{ data: { accessToken: string; refreshToken: string; user: any } }>("/auth/otp/complete-profile", {
+      method: "POST",
+      body: JSON.stringify(data),
+      skipAuth: true
+    }),
+
   register: (data: {
     firstName: string; lastName: string; email: string;
     password: string; confirmPassword: string; phone?: string;

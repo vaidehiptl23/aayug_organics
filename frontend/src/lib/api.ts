@@ -23,7 +23,7 @@ function getToken(): string | null {
   }
 }
 
-function setToken(accessToken: string, refreshToken: string) {
+export function setToken(accessToken: string, refreshToken: string) {
   if (typeof window === "undefined") return;
   try {
     const raw = localStorage.getItem("aayug-auth") ?? "{}";

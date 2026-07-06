@@ -2,7 +2,7 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import { User } from "@/types";
-import { authApi, cartApi, wishlistApi, ApiError } from "@/lib/api";
+import { authApi, cartApi, wishlistApi, ApiError, setToken } from "@/lib/api";
 import { useCartStore } from "./cart.store";
 import { useWishlistStore } from "./wishlist.store";
 
@@ -35,6 +35,10 @@ export const useAuthStore = create<AuthState>()(
         try {
           const res = await authApi.login(email, password);
           const { accessToken, refreshToken, user: apiUser } = res.data;
+          
+          // Write token synchronously to localStorage to ensure immediate fetch requests are authenticated
+          setToken(accessToken, refreshToken);
+          
           const user: User = {
             id: apiUser.id,
             firstName: apiUser.firstName,
@@ -81,6 +85,9 @@ export const useAuthStore = create<AuthState>()(
       },
 
       loginDirect: async (user, accessToken, refreshToken) => {
+        // Write token synchronously to localStorage to ensure immediate fetch requests are authenticated
+        setToken(accessToken, refreshToken);
+
         set({ user, accessToken, refreshToken, isAuthenticated: true });
 
         // Sync cart and wishlist on direct login/registration

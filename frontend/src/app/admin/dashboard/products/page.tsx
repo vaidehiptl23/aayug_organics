@@ -1,6 +1,6 @@
 "use client";
 import { useState, useEffect, useRef } from "react";
-import { adminFetch } from "@/lib/admin-api";
+import { adminFetch, BASE_URL } from "@/lib/admin-api";
 import { formatPrice } from "@/lib/utils";
 import { toast } from "@/lib/admin-toast";
 
@@ -152,7 +152,7 @@ export default function AdminProductsPage() {
       // Since it's formData, we call fetch directly
       const sessionStr = sessionStorage.getItem("admin_session");
       const token = sessionStr ? JSON.parse(sessionStr)?.token : null;
-      const res = await fetch(`http://localhost:5000/api/v1/products/${showImages.id}/images`, {
+      const res = await fetch(`${BASE_URL}/products/${showImages.id}/images`, {
         method: "POST",
         headers: token ? { "Authorization": `Bearer ${token}` } : {},
         body: formData

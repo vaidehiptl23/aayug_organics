@@ -60,6 +60,8 @@ const slides = [
   },
 ];
 
+const API = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:5000/api/v1";
+
 export function HeroBanner() {
   const [current, setCurrent] = useState(0);
   const [auto, setAuto] = useState(true);
@@ -73,7 +75,7 @@ export function HeroBanner() {
   useEffect(() => {
     const fetchFeatured = async () => {
       try {
-        const res = await fetch("http://localhost:5000/api/v1/products");
+        const res = await fetch(`${API}/products`);
         if (!res.ok) throw new Error("Failed to fetch");
         const json = await res.json();
         const apiProducts = json.data ?? [];

@@ -1,4 +1,4 @@
-const BASE_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:5000/api/v1";
+export const BASE_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:5000/api/v1";
 
 export async function adminFetch<T>(path: string, options: RequestInit = {}): Promise<T> {
   const sessionStr = typeof window !== "undefined" ? sessionStorage.getItem("admin_session") : null;

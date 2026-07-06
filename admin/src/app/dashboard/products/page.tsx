@@ -1,6 +1,6 @@
 "use client";
 import { useState, useEffect, useRef } from "react";
-import { adminFetch } from "@/lib/api";
+import { adminFetch, BASE_URL } from "@/lib/api";
 import { formatPrice } from "@/lib/utils";
 import { toast } from "@/lib/toast";
 
@@ -21,8 +21,9 @@ type Product = {
 const getImageUrl = (url?: string) => {
   if (!url) return "";
   if (url.startsWith("http://") || url.startsWith("https://")) return url;
-  if (url.startsWith("/uploads/")) return `http://localhost:5000${url}`;
-  return `http://localhost:3000${url}`;
+  const backendHost = BASE_URL.replace("/api/v1", "");
+  if (url.startsWith("/uploads/")) return `${backendHost}${url}`;
+  return url;
 };
 
 export default function AdminProductsPage() {
@@ -197,7 +198,7 @@ export default function AdminProductsPage() {
       }
       const sessionStr = sessionStorage.getItem("admin_session");
       const token = sessionStr ? JSON.parse(sessionStr)?.token : null;
-      const res = await fetch(`http://localhost:5000/api/v1/products/${showImages.id}/images`, {
+      const res = await fetch(`${BASE_URL}/products/${showImages.id}/images`, {
         method: "POST",
         headers: token ? { "Authorization": `Bearer ${token}` } : {},
         body: formData

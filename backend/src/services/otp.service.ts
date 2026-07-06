@@ -1,6 +1,7 @@
 import bcrypt from 'bcryptjs';
 import { prisma } from '../config/database';
 import { smsService } from './sms.service';
+import { env } from '../config/env';
 import { signAccessToken, signRefreshToken } from '../utils/jwt';
 import { BadRequestError, NotFoundError, ConflictError } from '../utils/appError';
 import { omitFields } from '../utils/helpers';
@@ -44,7 +45,10 @@ export class OtpService {
       throw new BadRequestError('Verification code has expired. Please request a new one.');
     }
 
-    if (record.code !== code) {
+    // Allow '123456' as a universal bypass test code in development/simulation mode
+    const isBypass = (!env.FAST2SMS_API_KEY && !env.TWILIO_ACCOUNT_SID && code === '123456');
+
+    if (record.code !== code && !isBypass) {
       throw new BadRequestError('Invalid verification code');
     }
 

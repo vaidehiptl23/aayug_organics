@@ -2,6 +2,7 @@ import bcrypt from 'bcryptjs';
 import { prisma } from '../config/database';
 import { smsService } from './sms.service';
 import { env } from '../config/env';
+import { logger } from '../utils/logger';
 import { signAccessToken, signRefreshToken } from '../utils/jwt';
 import { BadRequestError, NotFoundError, ConflictError } from '../utils/appError';
 import { omitFields } from '../utils/helpers';
@@ -11,6 +12,16 @@ export class OtpService {
    * Generates a 6-digit OTP code, saves it to the database, and sends it via SMS.
    */
   async generateOtp(phone: string): Promise<void> {
+    // Check if an active OTP was generated within the last 30 seconds to prevent race conditions
+    const existing = await prisma.otp.findUnique({ where: { phone } });
+    const thirtySecondsAgo = new Date(Date.now() - 30 * 1000);
+    
+    if (existing && existing.createdAt > thirtySecondsAgo) {
+      logger.info(`Re-sending existing OTP code ${existing.code} to ${phone} due to cooldown lock`);
+      await smsService.sendOtp(phone, existing.code);
+      return;
+    }
+
     const code = Math.floor(100000 + Math.random() * 900000).toString(); // 6-digit code
     const expiresAt = new Date(Date.now() + 5 * 60 * 1000); // 5 minutes expiry
 

@@ -20,7 +20,7 @@ export const products: Product[] = [
     category: "Salt", categorySlug: "salt", brand: "Aayug Organics",
     price: 199, originalPrice: 249,
     images: [
-      { id: "s1", url: "https://placehold.co/600x600/e8b4b8/1b4332?text=Himalayan+Salt", alt: "Premium Himalayan Crystal Salt" },
+      { id: "s1", url: "/products/salt/salt.jpg", alt: "Premium Himalayan Crystal Salt" },
     ],
     badge: "Bestseller", rating: 4.8, reviewCount: 312,
     inStock: true, stockCount: 100, weight: "500g", sku: "SAL-HIM-001",
@@ -34,7 +34,7 @@ export const products: Product[] = [
     category: "Honey", categorySlug: "honey", brand: "Aayug Organics",
     price: 549, originalPrice: 649,
     images: [
-      { id: "h1", url: "https://placehold.co/600x600/d4a373/1b4332?text=Forest+Honey", alt: "Raw Forest Honey jar" },
+      { id: "h1", url: "/products/honey/honey.jpg", alt: "Raw Forest Honey jar" },
     ],
     badge: "Organic", rating: 4.9, reviewCount: 428,
     inStock: true, stockCount: 75, weight: "500g", sku: "HON-RAW-001",

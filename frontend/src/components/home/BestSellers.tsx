@@ -5,6 +5,8 @@ import { ArrowRight, TrendingUp } from "lucide-react";
 import { ProductCard } from "@/components/products/ProductCard";
 import { bestSellers } from "@/data/products";
 
+const API = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:5000/api/v1";
+
 export function BestSellers() {
   const [products, setProducts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -12,7 +14,7 @@ export function BestSellers() {
   useEffect(() => {
     const loadBestsellers = async () => {
       try {
-        const res = await fetch("http://localhost:5000/api/v1/products?limit=8");
+        const res = await fetch(`${API}/products?limit=8`);
         if (!res.ok) throw new Error("Failed to fetch");
         const json = await res.json();
         

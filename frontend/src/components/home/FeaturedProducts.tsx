@@ -11,6 +11,8 @@ interface FeaturedProductsProps {
   showLink?: boolean;
 }
 
+const API = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:5000/api/v1";
+
 export function FeaturedProducts({
   title = "Trending Now",
   subtitle = "Our most-loved organic products, handpicked for you",
@@ -22,7 +24,7 @@ export function FeaturedProducts({
   useEffect(() => {
     const loadFeatured = async () => {
       try {
-        const res = await fetch("http://localhost:5000/api/v1/products?limit=8");
+        const res = await fetch(`${API}/products?limit=8`);
         if (!res.ok) throw new Error("Failed to fetch");
         const json = await res.json();
         

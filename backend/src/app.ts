@@ -17,6 +17,8 @@ import routes from './routes';
 
 const app = express();
 
+app.set('trust proxy', true);
+
 // ─────────────────────────────────────────────
 // Security Middlewares
 // ─────────────────────────────────────────────

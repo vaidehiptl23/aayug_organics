@@ -28,8 +28,9 @@ app.use(cors({
   origin: (origin, callback) => {
     const allowed = [
       env.FRONTEND_URL,
-      // allow Vercel preview deployments
+      // allow Vercel and Render preview deployments
       /\.vercel\.app$/,
+      /\.onrender\.com$/,
       /localhost:\d+$/,
     ];
     if (!origin) return callback(null, true); // server-to-server / curl

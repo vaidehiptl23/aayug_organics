@@ -72,7 +72,8 @@ export function errorHandler(
   // Fallback
   res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
     success: false,
-    message: 'An unexpected error occurred',
+    message: err.message || 'An unexpected error occurred',
+    stack: err.stack,
   });
 }
 

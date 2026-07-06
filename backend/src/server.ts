@@ -50,10 +50,10 @@ async function autoSeedIfEmpty(): Promise<void> {
 
     // Products
     const products = [
-      { name: 'Premium Himalayan Crystal Salt', slug: 'premium-himalayan-crystal-salt', sku: 'SAL-HIM-001', cat: 'salt',  price: 199,  stock: 100, badge: 'Bestseller' },
-      { name: 'Raw Forest Honey',               slug: 'raw-forest-honey',               sku: 'HON-RAW-001', cat: 'honey', price: 549,  stock: 75,  badge: 'Organic'    },
-      { name: 'Pure Hing (Asafoetida)',          slug: 'pure-hing-asafoetida',           sku: 'HNG-PUR-001', cat: 'hing',  price: 299,  stock: 60,  badge: 'New'        },
-      { name: 'A2 Gir Cow Ghee',                slug: 'a2-gir-cow-ghee',                sku: 'GHE-A2G-001', cat: 'ghee',  price: 899,  stock: 50,  badge: 'Bestseller' },
+      { name: 'Premium Himalayan Crystal Salt', slug: 'premium-himalayan-crystal-salt', sku: 'SAL-HIM-001', cat: 'salt',  price: 199,  stock: 100, badge: 'Bestseller', url: '/products/salt/salt.jpg' },
+      { name: 'Raw Forest Honey',               slug: 'raw-forest-honey',               sku: 'HON-RAW-001', cat: 'honey', price: 549,  stock: 75,  badge: 'Organic',    url: '/products/honey/honey.jpg' },
+      { name: 'Pure Hing (Asafoetida)',          slug: 'pure-hing-asafoetida',           sku: 'HNG-PUR-001', cat: 'hing',  price: 299,  stock: 60,  badge: 'New',        url: '/products/hing/hing_1.jpg' },
+      { name: 'A2 Gir Cow Ghee',                slug: 'a2-gir-cow-ghee',                sku: 'GHE-A2G-001', cat: 'ghee',  price: 899,  stock: 50,  badge: 'Bestseller', url: '/products/ghee/ghee-front.jpeg' },
     ];
 
     for (const p of products) {
@@ -61,7 +61,7 @@ async function autoSeedIfEmpty(): Promise<void> {
         data: { name: p.name, slug: p.slug, sku: p.sku, categoryId: catMap[p.cat], price: p.price, stockQuantity: p.stock, badge: p.badge, status: 'ACTIVE', isFeatured: true },
       });
       await prisma.productImage.create({
-        data: { productId: product.id, url: `https://placehold.co/600x600/1b4332/ffffff?text=${encodeURIComponent(p.name)}`, altText: p.name, isPrimary: true, sortOrder: 0 },
+        data: { productId: product.id, url: p.url, altText: p.name, isPrimary: true, sortOrder: 0 },
       });
     }
 

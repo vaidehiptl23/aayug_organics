@@ -62,6 +62,29 @@ class Mailer {
     );
   }
 
+  async sendOtpEmail(email: string, code: string): Promise<void> {
+    await this.sendMail(
+      email,
+      'Your Verification Code – Aayug Organics',
+      this.otpTemplate(code),
+    );
+  }
+
+  private otpTemplate(code: string): string {
+    return this.baseTemplate('Your Verification Code', `
+      <h2 style="color: #1b4332; text-align: center;">Your Verification Code 👋</h2>
+      <p style="text-align: center; font-size: 16px; color: #4a5568;">
+        Use the following one-time passcode (OTP) to securely log in or verify your account on Aayug Organics.
+      </p>
+      <div style="text-align: center; margin: 30px 0;">
+        <div style="background: #f0fdf4; border: 2px dashed #1b4332; display: inline-block; padding: 15px 40px; border-radius: 12px;">
+          <span style="font-size: 32px; font-weight: 800; letter-spacing: 6px; color: #1b4332;">${code}</span>
+        </div>
+      </div>
+      <p style="color: #666; font-size: 14px; text-align: center;">This code is valid for 5 minutes. Please do not share this code with anyone.</p>
+    `);
+  }
+
   private baseTemplate(title: string, content: string): string {
     return `
       <!DOCTYPE html>

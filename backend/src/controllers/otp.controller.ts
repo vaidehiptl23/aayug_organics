@@ -28,3 +28,29 @@ export const completeOtpProfile = async (req: Request, res: Response): Promise<v
   const result = await otpService.completeOtpProfile({ phone, firstName, lastName, email });
   sendCreated(res, result, 'Profile completed and logged in successfully');
 };
+
+export const sendEmailOtp = async (req: Request, res: Response): Promise<void> => {
+  const { email } = req.body;
+  if (!email) throw new BadRequestError('Email address is required');
+  
+  await otpService.generateEmailOtp(email);
+  sendSuccess(res, null, 'Email verification code sent successfully');
+};
+
+export const verifyEmailOtp = async (req: Request, res: Response): Promise<void> => {
+  const { email, code } = req.body;
+  if (!email || !code) throw new BadRequestError('Email address and verification code are required');
+
+  const result = await otpService.verifyEmailOtp(email, code);
+  sendSuccess(res, result, 'Email verification code verified successfully');
+};
+
+export const completeEmailOtpProfile = async (req: Request, res: Response): Promise<void> => {
+  const { email, firstName, lastName, phone } = req.body;
+  if (!email || !firstName || !lastName) {
+    throw new BadRequestError('All fields (email, firstName, lastName) are required');
+  }
+
+  const result = await otpService.completeEmailOtpProfile({ email, firstName, lastName, phone });
+  sendCreated(res, result, 'Profile completed and logged in successfully');
+};

@@ -135,6 +135,27 @@ export const authApi = {
       skipAuth: true
     }),
 
+  sendEmailOtp: (email: string) =>
+    apiFetch<{ success: boolean; message: string }>("/auth/otp/email/send", {
+      method: "POST",
+      body: JSON.stringify({ email }),
+      skipAuth: true
+    }),
+
+  verifyEmailOtp: (email: string, code: string) =>
+    apiFetch<{ data: { isNewUser: boolean; accessToken?: string; refreshToken?: string; user?: any; email?: string } }>("/auth/otp/email/verify", {
+      method: "POST",
+      body: JSON.stringify({ email, code }),
+      skipAuth: true
+    }),
+
+  completeEmailOtpProfile: (data: { email: string; firstName: string; lastName: string; phone?: string }) =>
+    apiFetch<{ data: { accessToken: string; refreshToken: string; user: any } }>("/auth/otp/email/complete-profile", {
+      method: "POST",
+      body: JSON.stringify(data),
+      skipAuth: true
+    }),
+
   register: (data: {
     firstName: string; lastName: string; email: string;
     password: string; confirmPassword: string; phone?: string;

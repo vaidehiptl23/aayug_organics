@@ -231,6 +231,29 @@ export default function CheckoutPage() {
         const orderData = (checkRes as any).data;
         const rzpKey = process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID || "rzp_test_placeholder";
 
+        // Mock simulation mode fallback if backend returned a mock provider ID
+        if (orderData.payment.providerOrderId?.startsWith('order_mock_') || rzpKey === 'rzp_test_placeholder') {
+          console.log("Simulating successful checkout payment (mock mode)...");
+          try {
+            await ordersApi.verifyPayment({
+              orderId: orderData.order.id,
+              providerOrderId: orderData.payment.providerOrderId,
+              providerPaymentId: `pay_mock_${Math.floor(100000 + Math.random() * 900000)}`,
+              providerSignature: "mock_signature",
+            });
+            setOrderNumber(orderData.order.orderNumber);
+            clearCart();
+            setOrderPlaced(true);
+            toast.success(`[Mock Mode] Payment successful! Order ${orderData.order.orderNumber} placed 🎉`);
+          } catch (err) {
+            const msg = err instanceof ApiError ? err.message : "Mock payment verification failed";
+            toast.error(msg);
+          } finally {
+            setPlacing(false);
+          }
+          return;
+        }
+
         const options: RazorpayOptions = {
           key: rzpKey,
           amount: orderData.payment.amount,

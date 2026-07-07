@@ -4,14 +4,15 @@ import { env } from '../config/env';
 import { PaymentProvider, PaymentInitiateResult, PaymentVerifyResult } from './payment.interface';
 import { AppError } from '../utils/appError';
 import { StatusCodes } from 'http-status-codes';
+import { logger } from '../utils/logger';
 
 export class RazorpayProvider implements PaymentProvider {
   private client: Razorpay;
 
   constructor() {
     this.client = new Razorpay({
-      key_id: env.RAZORPAY_KEY_ID,
-      key_secret: env.RAZORPAY_KEY_SECRET,
+      key_id: env.RAZORPAY_KEY_ID || 'rzp_test_placeholder',
+      key_secret: env.RAZORPAY_KEY_SECRET || 'your_razorpay_secret',
     });
   }
 
@@ -21,6 +22,18 @@ export class RazorpayProvider implements PaymentProvider {
     currency = 'INR',
     customer: { name: string; email: string; phone?: string },
   ): Promise<PaymentInitiateResult> {
+    // Mock simulation mode if no API credentials configured
+    if (!env.RAZORPAY_KEY_ID || !env.RAZORPAY_KEY_SECRET) {
+      logger.info(`[Razorpay MOCK MODE] Initiating mock payment for order ${orderId} (amount: ${amount})`);
+      return {
+        providerOrderId: `order_mock_${Math.floor(100000 + Math.random() * 900000)}`,
+        amount,
+        currency,
+        key: 'rzp_test_placeholder',
+        metadata: { isMock: true, order: { id: `order_mock_${Math.floor(100000 + Math.random() * 900000)}` } },
+      };
+    }
+
     const order = await this.client.orders.create({
       amount: Math.round(amount * 100), // paise
       currency,
@@ -42,6 +55,15 @@ export class RazorpayProvider implements PaymentProvider {
     providerPaymentId: string,
     signature?: string,
   ): Promise<PaymentVerifyResult> {
+    // Mock verification
+    if (!env.RAZORPAY_KEY_ID || !env.RAZORPAY_KEY_SECRET) {
+      logger.info(`[Razorpay MOCK MODE] Verifying mock payment for orderId: ${providerOrderId}`);
+      return {
+        isValid: signature === 'mock_signature' || signature?.startsWith('mock_'),
+        providerPaymentId,
+      };
+    }
+
     if (!signature) return { isValid: false };
 
     const body = `${providerOrderId}|${providerPaymentId}`;
@@ -61,6 +83,10 @@ export class RazorpayProvider implements PaymentProvider {
     amount: number,
     reason = 'Order cancellation',
   ): Promise<{ refundId: string }> {
+    if (!env.RAZORPAY_KEY_ID || !env.RAZORPAY_KEY_SECRET) {
+      return { refundId: `ref_mock_${Math.floor(100000 + Math.random() * 900000)}` };
+    }
+
     const refund = await this.client.payments.refund(providerPaymentId, {
       amount: Math.round(amount * 100),
       notes: { reason },
@@ -72,6 +98,10 @@ export class RazorpayProvider implements PaymentProvider {
     payload: unknown,
     signature: string,
   ): Promise<{ event: string; orderId?: string }> {
+    if (!env.RAZORPAY_KEY_ID || !env.RAZORPAY_KEY_SECRET) {
+      return { event: 'payment.captured' };
+    }
+
     const body = JSON.stringify(payload);
     const expectedSignature = crypto
       .createHmac('sha256', env.RAZORPAY_WEBHOOK_SECRET)

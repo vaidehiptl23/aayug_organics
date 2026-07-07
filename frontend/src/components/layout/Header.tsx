@@ -5,6 +5,7 @@ import { useState, useEffect, useRef } from "react";
 import {
   ShoppingCart, Heart, User, Search, Menu, X,
   ChevronDown, LogOut, Package, Settings, Home, MapPin,
+  Sun, Moon
 } from "lucide-react";
 import { useCartStore } from "@/store/cart.store";
 import { useWishlistStore } from "@/store/wishlist.store";
@@ -37,6 +38,34 @@ export function Header() {
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
   const searchRef = useRef<HTMLInputElement>(null);
+  
+  const [darkMode, setDarkMode] = useState(false);
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const isDark = document.documentElement.classList.contains("dark") || 
+                     localStorage.getItem("theme") === "dark" ||
+                     (!("theme" in localStorage) && window.matchMedia("(prefers-color-scheme: dark)").matches);
+      setDarkMode(isDark);
+      if (isDark) {
+        document.documentElement.classList.add("dark");
+      } else {
+        document.documentElement.classList.remove("dark");
+      }
+    }
+  }, []);
+
+  const toggleTheme = () => {
+    const nextDark = !darkMode;
+    setDarkMode(nextDark);
+    if (nextDark) {
+      document.documentElement.classList.add("dark");
+      localStorage.setItem("theme", "dark");
+    } else {
+      document.documentElement.classList.remove("dark");
+      localStorage.setItem("theme", "light");
+    }
+  };
 
   // Must wait for client mount before reading localStorage-backed stores
   useEffect(() => { setMounted(true); }, []);
@@ -148,6 +177,19 @@ export function Header() {
               </span>
             )}
           </Link>
+
+          {/* Theme Toggle */}
+          <button
+            onClick={toggleTheme}
+            className="group relative rounded-xl p-2.5 text-gray-600 transition-all hover:bg-gray-100 hover:text-[#1b4332] dark:text-gray-300 dark:hover:bg-gray-800"
+            aria-label="Toggle Theme"
+          >
+            {darkMode ? (
+              <Sun className="h-5 w-5 transition-transform duration-200 group-hover:scale-110 text-amber-500" />
+            ) : (
+              <Moon className="h-5 w-5 transition-transform duration-200 group-hover:scale-110 text-gray-600 dark:text-gray-300" />
+            )}
+          </button>
 
           {/* Cart */}
           <Link

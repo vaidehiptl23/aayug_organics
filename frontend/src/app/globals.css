@@ -9,24 +9,6 @@
   --foreground: #1c1d1f;
 }
 
-[data-color-theme="honey"] {
-  --color-primary: #b87d2a;
-  --color-primary-light: #dca03f;
-  --color-accent: #1b4332;
-}
-
-[data-color-theme="ghee"] {
-  --color-primary: #dfa62a;
-  --color-primary-light: #f5c453;
-  --color-accent: #1b4332;
-}
-
-[data-color-theme="spices"] {
-  --color-primary: #a24a24;
-  --color-primary-light: #c26137;
-  --color-accent: #1b4332;
-}
-
 @theme inline {
   --color-primary: var(--color-primary);
   --color-primary-light: var(--color-primary-light);
@@ -76,25 +58,25 @@ body {
   0%   { transform: translateX(0); }
   100% { transform: translateX(-50%); }
 }
+
 .animate-marquee {
-  animation: marquee 28s linear infinite;
   display: flex;
   width: max-content;
-}
-.animate-marquee:hover {
-  animation-play-state: paused;
+  animation: marquee 25s linear infinite;
 }
 
-/* Line clamp utilities */
-.line-clamp-1 { overflow: hidden; display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; }
-.line-clamp-2 { overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
-.line-clamp-3 { overflow: hidden; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; }
-
-/* Skeleton animation */
-@keyframes skeleton-pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.4; }
+/* Glassmorphism card utilities */
+.glass-card {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(10px);
+  border: 1px border-white/20;
 }
-.skeleton-pulse {
-  animation: skeleton-pulse 1.5s ease-in-out infinite;
+
+/* Secondary image grid slider */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }

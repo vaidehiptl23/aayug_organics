@@ -9,6 +9,24 @@
   --foreground: #1c1d1f;
 }
 
+[data-color-theme="honey"] {
+  --color-primary: #b87d2a;
+  --color-primary-light: #dca03f;
+  --color-accent: #1b4332;
+}
+
+[data-color-theme="ghee"] {
+  --color-primary: #dfa62a;
+  --color-primary-light: #f5c453;
+  --color-accent: #1b4332;
+}
+
+[data-color-theme="spices"] {
+  --color-primary: #a24a24;
+  --color-primary-light: #c26137;
+  --color-accent: #1b4332;
+}
+
 @theme inline {
   --color-primary: var(--color-primary);
   --color-primary-light: var(--color-primary-light);

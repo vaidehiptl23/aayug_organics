@@ -30,6 +30,13 @@ const announcements = [
   { icon: "🍯", text: "Raw Forest Honey — Unfiltered & Unheated" }
 ];
 
+const colorThemes = [
+  { id: "green",  label: "Forest Green",  color: "#1b4332" },
+  { id: "honey",  label: "Golden Honey",  color: "#b87d2a" },
+  { id: "ghee",   label: "A2 Ghee",       color: "#dfa62a" },
+  { id: "spices", label: "Organic Spices",color: "#a24a24" },
+];
+
 export function Header() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
@@ -40,6 +47,31 @@ export function Header() {
   const searchRef = useRef<HTMLInputElement>(null);
   
   const [darkMode, setDarkMode] = useState(false);
+  const [colorTheme, setColorTheme] = useState("green");
+  const [themeMenuOpen, setThemeMenuOpen] = useState(false);
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const savedTheme = localStorage.getItem("color-theme") || "green";
+      setColorTheme(savedTheme);
+      if (savedTheme !== "green") {
+        document.documentElement.setAttribute("data-color-theme", savedTheme);
+      } else {
+        document.documentElement.removeAttribute("data-color-theme");
+      }
+    }
+  }, []);
+
+  const changeColorTheme = (themeId: string) => {
+    setColorTheme(themeId);
+    localStorage.setItem("color-theme", themeId);
+    if (themeId !== "green") {
+      document.documentElement.setAttribute("data-color-theme", themeId);
+    } else {
+      document.documentElement.removeAttribute("data-color-theme");
+    }
+    setThemeMenuOpen(false);
+  };
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -177,6 +209,47 @@ export function Header() {
               </span>
             )}
           </Link>
+
+          {/* Color Theme Selector */}
+          <div className="relative">
+            <button
+              onClick={() => setThemeMenuOpen(!themeMenuOpen)}
+              className="group relative rounded-xl p-2.5 text-gray-600 transition-all hover:bg-gray-100 hover:text-[#1b4332] dark:text-gray-300 dark:hover:bg-gray-800 flex items-center justify-center"
+              aria-label="Select Color Theme"
+            >
+              <div 
+                className="h-5 w-5 rounded-full border border-gray-300 shadow-sm transition-transform duration-200 group-hover:scale-110"
+                style={{ backgroundColor: colorThemes.find(t => t.id === colorTheme)?.color || "#1b4332" }}
+              />
+            </button>
+
+            {themeMenuOpen && (
+              <div
+                className="absolute right-0 top-full mt-2 w-48 rounded-xl border border-gray-100 bg-white py-2 shadow-xl dark:border-gray-700 dark:bg-gray-800 z-50 animate-in fade-in slide-in-from-top-2 duration-200"
+                onMouseLeave={() => setThemeMenuOpen(false)}
+              >
+                <p className="px-4 py-1.5 text-[10px] font-bold text-gray-400 uppercase tracking-wider">
+                  Select Accent Vibe:
+                </p>
+                {colorThemes.map((t) => (
+                  <button
+                    key={t.id}
+                    onClick={() => changeColorTheme(t.id)}
+                    className={cn(
+                      "flex w-full items-center gap-3 px-4 py-2 text-sm text-gray-600 hover:bg-gray-50 dark:text-gray-300 dark:hover:bg-gray-700 text-left",
+                      colorTheme === t.id && "font-bold text-[#1b4332] dark:text-white bg-green-50/20"
+                    )}
+                  >
+                    <span 
+                      className="h-3 w-3 rounded-full border border-gray-200" 
+                      style={{ backgroundColor: t.color }} 
+                    />
+                    {t.label}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
 
           {/* Theme Toggle */}
           <button

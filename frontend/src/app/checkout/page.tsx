@@ -7,6 +7,7 @@ import {
   CreditCard, ClipboardList, ArrowLeft, ShieldCheck, Zap,
 } from "lucide-react";
 import { useCartStore } from "@/store/cart.store";
+import { useAuthStore } from "@/store/auth.store";
 import { ordersApi, userApi, ApiError } from "@/lib/api";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
@@ -66,6 +67,8 @@ const INITIAL: CheckoutFormData = {
 
 export default function CheckoutPage() {
   const { items, subtotal, discount, tax, total, clearCart } = useCartStore();
+  const { user, isAuthenticated } = useAuthStore();
+  
   const [step, setStep]           = useState<CheckoutStep>("address");
   const [form, setForm]           = useState<CheckoutFormData>(INITIAL);
   const [errors, setErrors]       = useState<Partial<Record<keyof CheckoutFormData, string>>>({});
@@ -73,6 +76,56 @@ export default function CheckoutPage() {
   const [orderPlaced, setOrderPlaced] = useState(false);
   const [orderNumber, setOrderNumber] = useState("");
   const [rzpReady, setRzpReady]   = useState(false);
+
+  const [savedAddresses, setSavedAddresses] = useState<any[]>([]);
+  const [selectedAddressId, setSelectedAddressId] = useState<string | null>(null);
+
+  // Fetch saved addresses if logged in
+  useEffect(() => {
+    if (isAuthenticated) {
+      userApi.getAddresses()
+        .then((res) => {
+          const addrs = (res as any).data ?? [];
+          setSavedAddresses(addrs);
+          
+          // Pre-populate with default address if available
+          const defaultAddr = addrs.find((a: any) => a.isDefault);
+          if (defaultAddr) {
+            handleSelectSavedAddress(defaultAddr);
+          }
+        })
+        .catch(console.error);
+    }
+  }, [isAuthenticated]);
+
+  const handleSelectSavedAddress = (addr: any) => {
+    setSelectedAddressId(addr.id);
+    setForm((p) => ({
+      ...p,
+      fullName: addr.fullName,
+      phone: addr.phone,
+      addressLine1: addr.addressLine1,
+      addressLine2: addr.addressLine2 || "",
+      city: addr.city,
+      state: addr.state,
+      postalCode: addr.postalCode,
+    }));
+    setErrors({});
+  };
+
+  const handleClearSelectedAddress = () => {
+    setSelectedAddressId(null);
+    setForm((p) => ({
+      ...p,
+      fullName: "",
+      phone: "",
+      addressLine1: "",
+      addressLine2: "",
+      city: "",
+      state: "",
+      postalCode: "",
+    }));
+  };
 
   const shipping = form.deliveryMethod === "express" ? 149 : form.deliveryMethod === "overnight" ? 249 : 0;
   const grandTotal = total() - discount() + shipping;
@@ -89,8 +142,13 @@ export default function CheckoutPage() {
     document.head.appendChild(s);
   }, []);
 
-  const set = (k: keyof CheckoutFormData, v: string | boolean) =>
+  const set = (k: keyof CheckoutFormData, v: string | boolean) => {
     setForm((p) => ({ ...p, [k]: v }));
+    // If user modifies any address field manually, clear the selectedAddressId
+    if (["fullName", "phone", "addressLine1", "addressLine2", "city", "state", "postalCode"].includes(k)) {
+      setSelectedAddressId(null);
+    }
+  };
 
   // ── Validation ─────────────────────────────────────────────
   const validateAddress = (): boolean => {
@@ -124,19 +182,23 @@ export default function CheckoutPage() {
   const handlePlaceOrder = async () => {
     setPlacing(true);
     try {
-      // 1. Add/Save address to user account first to get a database addressId
-      const addrRes = await userApi.addAddress({
-        fullName: form.fullName,
-        phone: form.phone,
-        addressLine1: form.addressLine1,
-        addressLine2: form.addressLine2 || undefined,
-        city: form.city,
-        state: form.state,
-        postalCode: form.postalCode,
-        country: "India",
-        isDefault: form.saveAddress,
-      });
-      const addressId = (addrRes as any).data.id;
+      let addressId: string = selectedAddressId || "";
+ 
+      if (!addressId) {
+        // 1. Add/Save address to user account first to get a database addressId
+        const addrRes = await userApi.addAddress({
+          fullName: form.fullName,
+          phone: form.phone,
+          addressLine1: form.addressLine1,
+          addressLine2: form.addressLine2 || undefined,
+          city: form.city,
+          state: form.state,
+          postalCode: form.postalCode,
+          country: "India",
+          isDefault: form.saveAddress,
+        });
+        addressId = (addrRes as any).data.id;
+      }
 
       if (form.paymentMethod === "cod") {
         // Real COD order placement
@@ -301,6 +363,65 @@ export default function CheckoutPage() {
               {step === "address" && (
                 <div>
                   <h2 className="mb-6 text-xl font-bold text-gray-800 dark:text-white">Shipping Address</h2>
+
+                  {/* Saved Addresses list */}
+                  {isAuthenticated && savedAddresses.length > 0 && (
+                    <div className="mb-6">
+                      <p className="mb-3 text-sm font-semibold text-gray-600 dark:text-gray-400">
+                        Select a saved address:
+                      </p>
+                      <div className="grid gap-3 sm:grid-cols-2">
+                        {savedAddresses.map((addr) => {
+                          const isSelected = selectedAddressId === addr.id;
+                          return (
+                            <button
+                              key={addr.id}
+                              type="button"
+                              onClick={() => handleSelectSavedAddress(addr)}
+                              className={cn(
+                                "flex flex-col text-left rounded-2xl border p-4 transition-all duration-200 cursor-pointer relative",
+                                isSelected
+                                  ? "border-[#1b4332] bg-green-50/10 ring-2 ring-[#1b4332] dark:border-green-400 dark:ring-green-400 dark:bg-green-950/10"
+                                  : "border-gray-200 hover:border-gray-300 dark:border-gray-700 dark:hover:border-gray-600 bg-white dark:bg-gray-900"
+                              )}
+                            >
+                              <div className="flex items-center justify-between mb-1">
+                                <span className="text-sm font-bold text-gray-800 dark:text-white">
+                                  {addr.fullName}
+                                </span>
+                                {addr.isDefault && (
+                                  <span className="rounded bg-[#1b4332]/10 px-1.5 py-0.5 text-[10px] font-extrabold text-[#1b4332] dark:bg-green-900/30 dark:text-green-400">
+                                    DEFAULT
+                                  </span>
+                                )}
+                              </div>
+                              <span className="text-xs text-gray-500 dark:text-gray-400 mb-1">{addr.phone}</span>
+                              <p className="text-xs text-gray-600 dark:text-gray-300 leading-relaxed line-clamp-2">
+                                {addr.addressLine1}{addr.addressLine2 ? `, ${addr.addressLine2}` : ""}, {addr.city}, {addr.state} - {addr.postalCode}
+                              </p>
+                            </button>
+                          );
+                        })}
+
+                        {/* Add New Option */}
+                        <button
+                          type="button"
+                          onClick={handleClearSelectedAddress}
+                          className={cn(
+                            "flex items-center justify-center rounded-2xl border border-dashed p-4 transition-all duration-200 cursor-pointer min-h-[100px]",
+                            selectedAddressId === null
+                              ? "border-[#1b4332] bg-green-50/10 dark:border-green-400 dark:bg-green-950/10"
+                              : "border-gray-200 hover:border-gray-300 dark:border-gray-700"
+                          )}
+                        >
+                          <span className="text-sm font-bold text-gray-600 dark:text-gray-400">
+                            + Add New Address
+                          </span>
+                        </button>
+                      </div>
+                      <hr className="my-6 border-gray-100 dark:border-gray-700" />
+                    </div>
+                  )}
                   <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                     <Input label="Full Name *" value={form.fullName} onChange={(e) => set("fullName", e.target.value)} error={errors.fullName} placeholder="Rahul Sharma" />
                     <Input label="Phone Number *" type="tel" value={form.phone} onChange={(e) => set("phone", e.target.value)} error={errors.phone} placeholder="9876543210" />
